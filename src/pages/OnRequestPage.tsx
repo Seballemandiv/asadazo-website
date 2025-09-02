@@ -60,12 +60,16 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
     }
   };
 
-  // UPDATED: send via our serverless API
+const API_URL =
+  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'https://v0-asadazo-website-seballemandiv-seballemandivs-projects.vercel.app/api/send-email'
+    : '/api/send-email';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      await fetch('/api/send-email', {
+      await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
