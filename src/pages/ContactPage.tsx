@@ -7,21 +7,19 @@ export default function ContactPage() {
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setValues((v) => ({ ...v, [e.target.name]: e.target.value }));
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const onSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
     setSent(true);
-  };
-
-  if (sent) {
-    return (
-      <div className="page container">
-        <div className="card">
-          <h2 className="title">Thank you</h2>
-          <p>We received your message and will reply within 24–48 hours.</p>
-        </div>
-      </div>
-    );
+  } catch {
+    alert('Something went wrong sending your message. Please try again.');
   }
+};
 
   return (
     <div className="page container">
