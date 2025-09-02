@@ -1,0 +1,36 @@
+.header {
+  position: sticky;
+  top: 0;
+  background: var(--espresso);
+  border-bottom: 1px solid var(--golden-beige);
+  z-index: 10;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.page {
+  min-height: calc(100vh - 56px);
+  padding: 2rem 1rem;
+}
+
+.title {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  margin: 0 0 1rem;
+}
+
+.card {
+  background: rgba(122, 51, 38, 0.12);
+  border: 1px solid rgba(233, 205, 155, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
