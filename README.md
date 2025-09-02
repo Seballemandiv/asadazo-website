@@ -48,25 +48,25 @@ A modern, responsive website for Asadazo, specializing in premium Argentine meat
 ## 🛠️ Installation
 
 1. **Clone the repository**
-   ```bash
+   \`\`\`bash
    git clone https://github.com/Seballemandiv/asadazo-website.git
    cd asadazo-website
-   ```
+   \`\`\`
 
 2. **Install dependencies**
-   ```bash
+   \`\`\`bash
    npm install
-   ```
+   \`\`\`
 
 3. **Start development server**
-   ```bash
+   \`\`\`bash
    npm run dev
-   ```
+   \`\`\`
 
 4. **Build for production**
-   ```bash
+   \`\`\`bash
    npm run build
-   ```
+   \`\`\`
 
 ## �� Configuration
 
