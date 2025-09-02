@@ -19,7 +19,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `;
 
     const result = await resend.emails.send({
-      // For quick start without domain verification, use onboarding@resend.dev
       from: 'Asadazo <onboarding@resend.dev>',
       to: [TO_EMAIL],
       subject,
