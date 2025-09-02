@@ -7,9 +7,18 @@ export default function OnRequestPage() {
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setValues((v) => ({ ...v, [e.target.name]: e.target.value }));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+      setSent(true);
+    } catch {
+      alert('Something went wrong submitting your request. Please try again.');
+    }
   };
 
   if (sent) {
@@ -53,4 +62,5 @@ export default function OnRequestPage() {
       </form>
     </div>
   );
+}
 }
