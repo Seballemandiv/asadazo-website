@@ -8,11 +8,11 @@ interface OnRequestPageProps {
   onLanguageChange: (lang: 'en' | 'es' | 'nl') => void;
 }
 
-const OnRequestPage: React.FC<OnRequestPageProps> = ({ 
-  cartCount, 
-  onCartClick, 
-  currentLanguage, 
-  onLanguageChange 
+const OnRequestPage: React.FC<OnRequestPageProps> = ({
+  cartCount,
+  onCartClick,
+  currentLanguage,
+  onLanguageChange
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -51,24 +51,36 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
         ...prev,
         picture: file
       }));
-      
-      // Create preview
+
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewImage(e.target?.result as string);
+      reader.onload = ev => {
+        setPreviewImage(ev.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // UPDATED: send via our serverless API
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log('Request submitted:', formData);
-    setIsSubmitted(true);
-    
-    // Reset form after submission
-    setTimeout(() => {
+
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          cut: formData.cutName,
+          notes: formData.additionalInfo,
+          imageProvided: Boolean(formData.picture) // we are not sending the file; just indicating if one was attached
+        })
+      });
+
+      setIsSubmitted(true);
+
+      // Reset form after submission
       setFormData({
         name: '',
         email: '',
@@ -78,8 +90,9 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
         picture: null
       });
       setPreviewImage(null);
-      setIsSubmitted(false);
-    }, 3000);
+    } catch {
+      alert('Something went wrong submitting your request. Please try again.');
+    }
   };
 
   return (
@@ -93,8 +106,7 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
               <div className="logo-icon">
                 <img src="/Logo full.svg" alt="Asadazo Logo" className="logo-image" />
               </div>
-              <div className="logo-text">
-              </div>
+              <div className="logo-text" />
             </div>
 
             {/* Back Button */}
@@ -105,7 +117,7 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
 
             {/* Language Switcher */}
             <div className="language-switcher">
-              <select 
+              <select
                 value={currentLanguage}
                 onChange={(e) => onLanguageChange(e.target.value as 'en' | 'es' | 'nl')}
                 className="language-select"
@@ -125,7 +137,7 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
             </button>
 
             {/* Mobile Menu Button */}
-            <button 
+            <button
               className="mobile-menu-button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -140,9 +152,10 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
         <div className="container">
           <div className="on-request-content">
             <h1>Request Custom Cut</h1>
-            
+
             <p className="page-description">
-              If the cut you are looking for is not currently available, please submit your request. We will look it up and provide you with an update within 24–48 hours. Thank you for your inquiry.
+              If the cut you are looking for is not currently available, please submit your request.
+              We will look it up and provide you with an update within 24–48 hours. Thank you for your inquiry.
             </p>
 
             {isSubmitted ? (
@@ -165,7 +178,6 @@ const OnRequestPage: React.FC<OnRequestPageProps> = ({
                       name="picture"
                       accept="image/*"
                       onChange={handleImageChange}
-                      required
                       className="file-input"
                     />
                     <label htmlFor="picture" className="file-upload-label">
