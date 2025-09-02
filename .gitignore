@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# project archives
+*.zip
+
+#project archives
+*.zip
