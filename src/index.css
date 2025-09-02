@@ -1,0 +1,27 @@
+:root {
+  --espresso: #2B1F18;
+  --malbec: #7A3326;
+  --golden-beige: #E9CD9B;
+  --white-smoked: #F5F5F5;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--espresso);
+  color: var(--golden-beige);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--golden-beige);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
