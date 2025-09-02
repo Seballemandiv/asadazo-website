@@ -6,7 +6,7 @@ export default function ProductsPage() {
     <div className="page container">
       <h1 className="title">Our signature cuts</h1>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '1.25rem' }}>
-        {products.map(p => (
+        {products.map((p) => (
           <div key={p.id} className="card" style={{ backdropFilter: 'blur(8px)' }}>
             <h3 style={{ margin: '0 0 0.5rem' }}>{p.name}</h3>
             <p style={{ margin: '0 0 0.75rem', opacity: 0.9 }}>{p.description}</p>
