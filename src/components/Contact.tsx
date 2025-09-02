@@ -22,45 +22,33 @@ const Contact: React.FC = () => {
     return Object.keys(e).length === 0;
   };
 
+  const API_URL =
+  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'https://v0-asadazo-website-seballemandiv-seballemandivs-projects.vercel.app/api/send-email'
+    : '/api/send-email';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      // Formspree Integration
-      const formspreeEndpoint = 'https://formspree.io/f/mldwllla';
-      
-      const response = await fetch(formspreeEndpoint, {
+      const res = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           subject: formData.subject,
-          message: formData.message,
-          _replyto: formData.email,
-          _subject: `Contact Form: ${formData.subject}`,
-          // This will forward emails to your specified address
-          _cc: 'allemandi.Sebastian@expandam.nl'
-        }),
+          message: formData.message
+        })
       });
 
-      if (response.ok) {
-        setSubmitted(true);
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        throw new Error('Form submission failed');
-      }
-      
-      // Option 2: Simulate submission (for testing without email service)
-      // await new Promise(resolve => setTimeout(resolve, 1000));
-      // setSubmitted(true);
-      // setFormData({ name: '', email: '', subject: '', message: '' });
-      
+      if (!res.ok) throw new Error('Submit failed');
+
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       console.error('Form submission failed:', error);
       setErrors({ general: 'Failed to send message. Please try again later.' });
@@ -82,7 +70,7 @@ const Contact: React.FC = () => {
           <h1>Contact Us</h1>
           <p>Get in touch with us for any questions or inquiries</p>
         </div>
-        
+
         <div className="contact-form-card">
           {!submitted ? (
             <form onSubmit={handleSubmit} className="contact-form">
@@ -91,7 +79,7 @@ const Contact: React.FC = () => {
                   {errors.general}
                 </div>
               )}
-              
+
               <div className="contact-form-row">
                 <div className="form-group">
                   <label htmlFor="name">Name</label>
@@ -108,7 +96,7 @@ const Contact: React.FC = () => {
                   />
                   {errors.name && <span className="field-error">{errors.name}</span>}
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="email">Email</label>
                   <input
@@ -122,10 +110,10 @@ const Contact: React.FC = () => {
                     required
                     disabled={isSubmitting}
                   />
-                  {errors.email && <span className="field-error">{errors.email}</span>}
+                  {errors.email && <span className="al field-error">{errors.email}</span>}
                 </div>
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="subject">Subject</label>
                 <input
@@ -141,7 +129,7 @@ const Contact: React.FC = () => {
                 />
                 {errors.subject && <span className="field-error">{errors.subject}</span>}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="message">Message</label>
                 <textarea
@@ -157,9 +145,9 @@ const Contact: React.FC = () => {
                 ></textarea>
                 {errors.message && <span className="field-error">{errors.message}</span>}
               </div>
-              
-              <button 
-                type="submit" 
+
+              <button
+                type="submit"
                 className="btn-primary contact-submit"
                 disabled={isSubmitting}
               >
