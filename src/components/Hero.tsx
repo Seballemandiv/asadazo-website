@@ -28,7 +28,7 @@ const Hero = () => {
           </h1>
 
           <p className="hero-sub">
-            Entraña, vacío, matambre de cerdo, achuras and more.
+            Entraña, vacío, matambres, achuras and more.
           </p>
 
           <div className="hero-ctas">
