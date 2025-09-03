@@ -3,7 +3,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import AppShell from './components/AppShell';
 import Hero from './components/Hero';
-import ProductGrid from './components/ProductGrid';
 import FeaturesSection from './components/FeaturesSection';
 import About from './components/About';
 import Contact from './components/Contact';
@@ -15,6 +14,7 @@ import RegisterPage from './pages/RegisterPage';
 import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import MediaLinks from './components/MediaLinks';
 import './components.css';
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
               <Route path="/" element={
                 <AppShell>
                   <Hero />
-                  <ProductGrid />
+		   <MediaLinks />
                   <FeaturesSection />
                 </AppShell>
               } />
