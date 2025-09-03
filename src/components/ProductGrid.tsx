@@ -22,7 +22,16 @@ const ProductGrid = () => {
     const savedProducts = localStorage.getItem('asadazo_products');
     if (savedProducts) {
       try {
-        setProducts(JSON.parse(savedProducts));
+        const parsed: Product[] = JSON.parse(savedProducts);
+        // Migration/sanitization: ensure images use /images/... paths
+        const sanitized = parsed.map((p) => {
+          const defaultMatch = initialProducts.find(d => d.id === p.id);
+          const isValidPublicPath = typeof p.image === 'string' && p.image.startsWith('/');
+          const image = isValidPublicPath ? p.image : (defaultMatch?.image ?? p.image);
+          return { ...p, image } as Product;
+        });
+        setProducts(sanitized);
+        localStorage.setItem('asadazo_products', JSON.stringify(sanitized));
       } catch (error) {
         console.error('Error loading saved products:', error);
         setProducts(initialProducts);
@@ -34,22 +43,7 @@ const ProductGrid = () => {
     }
   }, []);
 
-  // Listen for changes to localStorage (when admin updates products)
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const savedProducts = localStorage.getItem('asadazo_products');
-      if (savedProducts) {
-        try {
-          setProducts(JSON.parse(savedProducts));
-        } catch (error) {
-          console.error('Error loading saved products:', error);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  // Removed storage listener to prevent unnecessary re-renders that broke images
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
