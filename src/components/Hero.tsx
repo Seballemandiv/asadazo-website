@@ -23,7 +23,7 @@ const Hero = () => {
           <h1 className="hero-title">
             <span className="line-1">Boutique meat,</span>
             <span className="line-2">
-              Argentinian <span className="nowrap">way</span>
+              Argentinian <span className="nowrap">way.</span>
             </span>
           </h1>
 
