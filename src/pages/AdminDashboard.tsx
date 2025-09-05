@@ -250,7 +250,7 @@ const AdminDashboard = () => {
                          (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }).slice().sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 
   const categories = [
     { value: 'all', label: 'All Categories' },

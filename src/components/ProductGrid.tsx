@@ -49,7 +49,7 @@ const ProductGrid = () => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }).slice().sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 
   return (
     <section id="products" className="products-section">
