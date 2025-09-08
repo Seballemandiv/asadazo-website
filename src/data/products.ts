@@ -4,7 +4,7 @@ export const products: Product[] = [
   // Meat (Carne) - Beef cuts
   {
     id: 'entraña',
-    name: 'Entraña',
+    name: 'Entrana',
     price: 24,
     pricePerKg: true,
     minPack: 1,
@@ -22,7 +22,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'meat',
     description: 'Top sirloin.',
-    image: '/images/Products/Colita de cuadril.jpg'
+    image: '/images/Products/Colita-de-cuadril.jpg'
   },
   {
     id: 'vacio',
@@ -34,17 +34,6 @@ export const products: Product[] = [
     category: 'meat',
     description: 'Flank steak.',
     image: '/images/Products/Vacio.jpg'
-  },
-  {
-    id: 'bola-de-lomo',
-    name: 'Bola de Lomo',
-    price: 26,
-    pricePerKg: true,
-    minPack: 1,
-    stock: 0,
-    category: 'meat',
-    description: 'Eye of round.',
-    image: '/images/Products/Bola-de-lomo.jpg'
   },
   {
     id: 'peceto',
@@ -66,7 +55,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'meat',
     description: 'Traditional asado cut \(Costillar marcado on request\)',
-    image: '/images/Product/Asado.jpg'
+    image: '/images/Products/Asado.jpg'
   },
   {
     id: 'bife-de-chorizo',
@@ -100,17 +89,6 @@ export const products: Product[] = [
     category: 'meat',
     description: 'Tenderloin, the most tender cut',
     image: '/images/Products/Bola-de-lomo.jpg'
-  },
-  {
-    id: 'colita-de-cuadril',
-    name: 'Colita de Cuadril',
-    price: 26,
-    pricePerKg: true,
-    minPack: 1,
-    stock: 0,
-    category: 'meat',
-    description: 'Tri-tip.',
-    image: '/images/Products/Colita-de-cuadril.jpg'
   },
   {
     id: 'paleta',
