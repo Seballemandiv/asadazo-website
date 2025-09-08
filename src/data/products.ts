@@ -3,26 +3,26 @@ import type { Product } from '../types';
 export const products: Product[] = [
   // Meat (Carne) - Beef cuts
   {
-    id: 'entrana',
+    id: 'entraña',
     name: 'Entraña',
     price: 24,
     pricePerKg: true,
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Premium skirt steak, perfect for grilling',
+    description: 'Premium skirt steak.',
     image: '/images/Products/entrana.jpg'
   },
   {
     id: 'cuadril',
-    name: 'Cuadril',
+    name: 'Colita de cuadril',
     price: 24,
     pricePerKg: true,
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Top sirloin, tender and flavorful',
-    image: '/images/cuadril.jpg'
+    description: 'Top sirloin.',
+    image: '/images/Products/Colita de cuadril.jpg'
   },
   {
     id: 'vacio',
@@ -32,7 +32,7 @@ export const products: Product[] = [
     minPack: 2,
     stock: 0,
     category: 'meat',
-    description: 'Flank steak, perfect for asado',
+    description: 'Flank steak.',
     image: '/images/Products/Vacio.jpg'
   },
   {
@@ -43,8 +43,8 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Eye of round, lean and tender',
-    image: '/images/Products/Bola de lomo.jpg'
+    description: 'Eye of round.',
+    image: '/images/Products/Bola-de-lomo.jpg'
   },
   {
     id: 'peceto',
@@ -54,30 +54,19 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Top round, excellent for roasting',
-    image: '/images/peceto.jpg'
+    description: 'Top round.',
+    image: '/images/Products/Peceto.jpg'
   },
   {
     id: 'asado',
-    name: 'Asado. Traditional asado cut (Costillar marcado on request)',
+    name: 'Asado',
     price: 22,
     pricePerKg: true,
     minPack: 10,
     stock: 0,
     category: 'meat',
-    description: 'Rib rack, traditional asado cut',
-    image: '/images/Products/Asado.jpg'
-  },
-  {
-    id: 'tira-de-asado',
-    name: 'Tira de Asado',
-    price: 22,
-    pricePerKg: true,
-    minPack: 1,
-    stock: 0,
-    category: 'meat',
-    description: 'Short ribs, classic asado',
-    image: '/images/Products/Tapa de asado.jpg'
+    description: 'Traditional asado cut \(Costillar marcado on request\)',
+    image: '/images/Product/Asado.jpg'
   },
   {
     id: 'bife-de-chorizo',
@@ -88,7 +77,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'meat',
     description: 'Strip steak, premium grilling cut',
-    image: '/images/Products/Bife de chorizo.jpg'
+    image: '/images/Products/Bife-de-chorizo.jpg'
   },
   {
     id: 'ojo-de-bife',
@@ -99,40 +88,18 @@ export const products: Product[] = [
     stock: 0,
     category: 'meat',
     description: 'Ribeye steak, marbled and juicy',
-    image: '/images/Products/Ojo de bife.jpg'
-  },
-  {
-    id: 'bife-ancho',
-    name: 'Bife Ancho. Rib Eye',
-    price: 45,
-    pricePerKg: true,
-    minPack: 2.5,
-    stock: 0,
-    category: 'meat',
-    description: 'Rib Eye steak, premium marbled cut',
-    image: '/images/Products/Bife Ancho.jpg'
-  },
-  {
-    id: 'bife-angosto',
-    name: 'Bife angosto. Striploin',
-    price: 42,
-    pricePerKg: true,
-    minPack: 2,
-    stock: 0,
-    category: 'meat',
-    description: 'Striploin steak, tender and flavorful',
-    image: '/images/Products/Bife Angosto.jpg'
+    image: '/images/Products/Ojo-de-bife.jpg'
   },
   {
     id: 'lomo',
-    name: 'Lomo',
+    name: 'Bola de Lomo',
     price: 47,
     pricePerKg: true,
     minPack: 2.5,
     stock: 0,
     category: 'meat',
     description: 'Tenderloin, the most tender cut',
-    image: '/images/lomo.jpg'
+    image: '/images/Products/Bola-de-lomo.jpg'
   },
   {
     id: 'colita-de-cuadril',
@@ -142,8 +109,8 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Tri-tip, flavorful and versatile',
-    image: '/images/Products/Colita de cuadril.jpg'
+    description: 'Tri-tip.',
+    image: '/images/Products/Colita-de-cuadril.jpg'
   },
   {
     id: 'paleta',
@@ -154,7 +121,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'meat',
     description: 'Chuck roast, perfect for slow cooking',
-    image: '/images/paleta.jpg'
+    image: '/images/Products/paleta.jpg'
   },
   {
     id: 'falda',
@@ -164,19 +131,19 @@ export const products: Product[] = [
     minPack: 0.5,
     stock: 0,
     category: 'meat',
-    description: 'Skirt steak, great for tacos',
-    image: '/images/falda.jpg'
+    description: 'Skirt steak.',
+    image: '/images/Products/falda.jpg'
   },
   {
-    id: 'matambre',
-    name: 'Matambre',
+    id: 'matambre-de-novillo',
+    name: 'Matambre de Novillo',
     price: 21,
     pricePerKg: true,
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Flank steak roll, traditional preparation',
-    image: '/images/matambre.jpg'
+    description: 'Flank steak roll.',
+    image: '/images/Products/Matambre-de-novillo.jpg'
   },
   {
     id: 'picana',
@@ -187,7 +154,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'meat',
     description: 'Top sirloin cap, Brazilian favorite',
-    image: '/images/picana.jpg'
+    image: '/images/Products/picana.jpg'
   },
 
   // Pork cuts
@@ -199,19 +166,19 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'pork',
-    description: 'Pork flank, perfect for grilling',
-    image: '/images/Products/Matambre de cerdo.jpg'
+    description: 'Pork Flank steak roll',
+    image: '/images/Products/Matambre-de-cerdo.jpg'
   },
   {
     id: 'bondiola',
-    name: 'Bondiola de cerdo. Pork shoulder',
+    name: 'Bondiola de Cerdo',
     price: 19,
     pricePerKg: true,
     minPack: 2,
     stock: 0,
     category: 'pork',
-    description: 'Pork shoulder, great for roasting',
-    image: '/images/Products/Bondiola de cerdo.jpg'
+    description: 'Pork shoulder',
+    image: '/images/Products/Bondiola-de-cerdo.jpg'
   },
   {
     id: 'costilla-de-cerdo',
@@ -221,8 +188,8 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'pork',
-    description: 'Pork ribs, perfect for BBQ',
-    image: '/images/costilla-de-cerdo.jpg'
+    description: 'Pork ribs,
+    image: '/images/Products/Costilla-de-cerdo.jpg'
   },
   {
     id: 'lomo-de-cerdo',
@@ -233,7 +200,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'pork',
     description: 'Pork tenderloin, lean and tender',
-    image: '/images/lomo-de-cerdo.jpg'
+    image: '/images/Products/lomo-de-cerdo.jpg'
   },
   {
     id: 'chuleta-de-cerdo',
@@ -244,7 +211,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'pork',
     description: 'Pork chops, classic cut',
-    image: '/images/chuleta-de-cerdo.jpg'
+    image: '/images/Products/chuleta-de-cerdo.jpg'
   },
   {
     id: 'pernil',
@@ -255,7 +222,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'pork',
     description: 'Pork leg, traditional roast',
-    image: '/images/pernil.jpg'
+    image: '/images/Products/pernil.jpg'
   },
 
   // Sausages
@@ -268,7 +235,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'sausages',
     description: 'Traditional Argentine chorizo',
-    image: '/images/Products/Chorizo Criollo Argentino.jpg'
+    image: '/images/Products/chorizo-criollo-argentino.jpg'
   },
   {
     id: 'morcilla',
@@ -279,18 +246,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'sausages',
     description: 'Blood sausage, rich and flavorful',
-    image: '/images/Products/Morcilla dulce.jpg'
-  },
-  {
-    id: 'chorizo-parrillero',
-    name: 'Salchicha parrillera. Grilling sausage',
-    price: 19,
-    pricePerKg: true,
-    minPack: 1,
-    stock: 0,
-    category: 'sausages',
-    description: 'Grilling chorizo, perfect for asado',
-    image: '/images/Products/Salchicha Parrillera.jpg'
+    image: '/images/Products/morcilla-dulce.jpg'
   },
   {
     id: 'salchicha-parrillera',
@@ -300,8 +256,8 @@ export const products: Product[] = [
     minPack: 0.3,
     stock: 0,
     category: 'sausages',
-    description: 'Grilling sausages, classic asado',
-    image: '/images/salchicha-parrillera.jpg'
+    description: 'Grilling sausages',
+    image: '/images/Products/Salchicha-parrillera.jpg'
   },
 
   // Achuras (Offal)
@@ -313,19 +269,19 @@ export const products: Product[] = [
     minPack: 0.5,
     stock: 0,
     category: 'achuras',
-    description: 'Small intestines.',
+    description: 'Small intestines',
     image: '/images/Products/Chinchulines.jpg'
   },
   {
     id: 'molleja',
-    name: 'Molleja',
+    name: 'Molleja de Corazon',
     price: 45,
     pricePerKg: true,
     minPack: 0.5,
     stock: 0,
     category: 'achuras',
     description: 'Sweetbreads, a delicacy',
-    image: '/images/Products/Mollejas de corazon.jpg'
+    image: '/images/Products/Molleja.jpg'
   },
   {
     id: 'tripa-gorda',
