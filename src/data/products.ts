@@ -188,7 +188,7 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'pork',
-    description: 'Pork ribs,
+    description: 'Pork ribs',
     image: '/images/Products/Costilla-de-cerdo.jpg'
   },
   {
