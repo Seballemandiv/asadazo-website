@@ -119,7 +119,7 @@ export const products: Product[] = [
     pricePerKg: true,
     minPack: 0,
     stock: 0,
-    category: 'beef',
+    category: 'meat',
     description: 'Premium tenderloin',
     image: '/images/Products/lomo-de-novillo.jpg'
   },
@@ -270,7 +270,8 @@ export const products: Product[] = [
     category: 'achuras',
     description: 'cutting of black pudding wheel',
     image: '/images/Products/morcilla-rueda.jpg'
-  },{
+  }
+,{
     id: 'bife-ancho',
     name: 'Bife Ancho',
     price: 45,
