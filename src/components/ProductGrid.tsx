@@ -17,9 +17,23 @@ const ProductGrid = () => {
     { id: 'achuras', name: 'Achuras' }
   ];
 
+  // LocalStorage key with versioning to avoid stale data across deployments
+  const PRODUCTS_STORAGE_KEY = 'asadazo_products_v3';
+
   // Load products from localStorage on mount, or use initial products if none saved
   useEffect(() => {
-    const savedProducts = localStorage.getItem('asadazo_products');
+    // Try new key first
+    let savedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+    // Migrate from older keys if present
+    if (!savedProducts) {
+      const legacy = localStorage.getItem('asadazo_products');
+      if (legacy) {
+        savedProducts = legacy;
+        // write to new key and remove legacy
+        localStorage.setItem(PRODUCTS_STORAGE_KEY, legacy);
+        localStorage.removeItem('asadazo_products');
+      }
+    }
     if (savedProducts) {
       try {
         const parsed: Product[] = JSON.parse(savedProducts);
@@ -31,7 +45,7 @@ const ProductGrid = () => {
           return { ...p, image } as Product;
         });
         setProducts(sanitized);
-        localStorage.setItem('asadazo_products', JSON.stringify(sanitized));
+        localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(sanitized));
       } catch (error) {
         console.error('Error loading saved products:', error);
         setProducts(initialProducts);
@@ -39,7 +53,7 @@ const ProductGrid = () => {
     } else {
       // Initialize with default products if no saved data
       setProducts(initialProducts);
-      localStorage.setItem('asadazo_products', JSON.stringify(initialProducts));
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(initialProducts));
     }
   }, []);
 

@@ -105,9 +105,21 @@ const AdminDashboard = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
+  // Use versioned storage key to prevent stale products from older deployments
+  const PRODUCTS_STORAGE_KEY = 'asadazo_products_v3';
+
   // Load products from localStorage on mount, or use initial products if none saved
   useEffect(() => {
-    const savedProducts = localStorage.getItem('asadazo_products');
+    let savedProducts = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+    if (!savedProducts) {
+      // migrate legacy key
+      const legacy = localStorage.getItem('asadazo_products');
+      if (legacy) {
+        savedProducts = legacy;
+        localStorage.setItem(PRODUCTS_STORAGE_KEY, legacy);
+        localStorage.removeItem('asadazo_products');
+      }
+    }
     if (savedProducts) {
       try {
         setProducts(JSON.parse(savedProducts));
@@ -118,13 +130,13 @@ const AdminDashboard = () => {
     } else {
       // Initialize with default products if no saved data
       setProducts(initialProducts);
-      localStorage.setItem('asadazo_products', JSON.stringify(initialProducts));
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(initialProducts));
     }
   }, []);
 
   // Save products to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('asadazo_products', JSON.stringify(products));
+    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
   }, [products]);
 
   const showToastMessage = (message: string, type: 'success' | 'error') => {
