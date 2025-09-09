@@ -8,7 +8,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const data = req.body || {};
+    if (!process.env.RESEND_API_KEY) {
+      return res.status(500).json({ error: 'Missing RESEND_API_KEY' });
+    }
+    if (!TO_EMAIL) {
+      return res.status(500).json({ error: 'Missing TO_EMAIL' });
+    }
+
+    // In some runtimes the body may be a string – try to parse
+    const data = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const subject = data.subject || data.cut || 'Website message';
 
     const html = `
@@ -25,9 +33,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       html
     });
 
-    if ((result as any)?.error) return res.status(500).json({ error: String((result as any).error) });
+    if ((result as any)?.error) {
+      console.error('Resend error:', (result as any).error);
+      return res.status(500).json({ error: (result as any).error, message: (result as any).error?.message || 'Resend error' });
+    }
     return res.status(200).json({ ok: true });
   } catch (err: any) {
+    console.error('send-email error:', err);
     return res.status(500).json({ error: err?.message || 'Email send failed' });
   }
 }
