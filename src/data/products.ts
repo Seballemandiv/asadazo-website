@@ -91,26 +91,37 @@ export const products: Product[] = [
     image: '/images/Products/Bola-de-lomo.jpg'
   },
   {
-    id: 'paleta',
-    name: 'Paleta',
-    price: 18,
+    id: 'milanesa-de-cuadrada',
+    name: 'Milanesa de cuadrada',
+    price: 27,
     pricePerKg: true,
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Chuck roast, perfect for slow cooking',
-    image: '/images/Products/paleta.jpg'
+    description: 'Square cut chuck schnitzel',
+    image: '/images/Products/milanesa-de-cuadrada.jpg'
   },
   {
-    id: 'falda',
-    name: 'Falda',
-    price: 16,
+    id: 'milanesa-de-nalga',
+    name: 'Milanesa de nalga',
+    price: 28,
     pricePerKg: true,
-    minPack: 0.5,
+    minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Skirt steak.',
-    image: '/images/Products/falda.jpg'
+    description: 'Top round schnitzel.',
+    image: '/images/Products/milanesa-de-nalga.jpg'
+  },
+  {
+    id: 'lomo-de-novillo',
+    name: 'lomo-de-novillo',
+    price: 58,
+    pricePerKg: true,
+    minPack: 0,
+    stock: 0,
+    category: 'beef',
+    description: 'Premium tenderloin',
+    image: '/images/Products/lomo-de-novillo.jpg'
   },
   {
     id: 'matambre-de-novillo',
@@ -131,8 +142,8 @@ export const products: Product[] = [
     minPack: 1,
     stock: 0,
     category: 'meat',
-    description: 'Top sirloin cap, Brazilian favorite',
-    image: '/images/Products/picana.jpg'
+    description: 'Top sirloin cap',
+    image: '/images/Products/Picana.jpg'
   },
 
   // Pork cuts
@@ -180,29 +191,6 @@ export const products: Product[] = [
     description: 'Pork tenderloin, lean and tender',
     image: '/images/Products/lomo-de-cerdo.jpg'
   },
-  {
-    id: 'chuleta-de-cerdo',
-    name: 'Chuleta de Cerdo',
-    price: 20,
-    pricePerKg: true,
-    minPack: 1,
-    stock: 0,
-    category: 'pork',
-    description: 'Pork chops, classic cut',
-    image: '/images/Products/chuleta-de-cerdo.jpg'
-  },
-  {
-    id: 'pernil',
-    name: 'Pernil',
-    price: 17,
-    pricePerKg: true,
-    minPack: 0,
-    stock: 0,
-    category: 'pork',
-    description: 'Pork leg, traditional roast',
-    image: '/images/Products/pernil.jpg'
-  },
-
   // Sausages
   {
     id: 'chorizo-criollo',
@@ -213,18 +201,7 @@ export const products: Product[] = [
     stock: 0,
     category: 'sausages',
     description: 'Traditional Argentine chorizo',
-    image: '/images/Products/chorizo-criollo-argentino.jpg'
-  },
-  {
-    id: 'morcilla',
-    name: 'Morcilla',
-    price: 18,
-    pricePerKg: true,
-    minPack: 0.3,
-    stock: 0,
-    category: 'sausages',
-    description: 'Blood sausage, rich and flavorful',
-    image: '/images/Products/morcilla-dulce.jpg'
+    image: '/images/Products/Chorizo-criollo-argentino.jpg'
   },
   {
     id: 'salchicha-parrillera',
@@ -240,6 +217,17 @@ export const products: Product[] = [
 
   // Achuras (Offal)
   {
+    id: 'morcilla',
+    name: 'Morcilla dulce',
+    price: 18,
+    pricePerKg: true,
+    minPack: 0.3,
+    stock: 0,
+    category: 'achuras',
+    description: 'Blood sausage, rich and flavorful',
+    image: '/images/Products/morcilla-dulce.jpg'
+  },
+  {
     id: 'chinchulines',
     name: 'Chinchulines',
     price: 32,
@@ -247,8 +235,19 @@ export const products: Product[] = [
     minPack: 0.5,
     stock: 0,
     category: 'achuras',
-    description: 'Small intestines',
+    description: 'Small intestines.',
     image: '/images/Products/Chinchulines.jpg'
+  },
+  {
+    id: 'Morcilla bombón',
+    name: 'Morcilla bombón criolla',
+    price: 18,
+    pricePerKg: true,
+    minPack: 0.5,
+    stock: 0,
+    category: 'achuras',
+    description: 'Morcilla bombón criolla',
+    image: '/images/Products/morcilla-bombon.jpg'
   },
   {
     id: 'molleja',
@@ -262,18 +261,37 @@ export const products: Product[] = [
     image: '/images/Products/Molleja.jpg'
   },
   {
-    id: 'tripa-gorda',
-    name: 'Tripa Gorda',
+    id: 'morcilla rueda',
+    name: 'Morcilla rueda',
     price: 18,
     pricePerKg: true,
     minPack: 0.5,
     stock: 0,
     category: 'achuras',
-    description: 'Large intestines, for stuffing',
-    image: '/images/tripa-gorda.jpg'
+    description: 'cutting of black pudding wheel',
+    image: '/images/Products/morcilla-rueda.jpg'
+  },{
+    id: 'bife-ancho',
+    name: 'Bife Ancho',
+    price: 45,
+    pricePerKg: true,
+    minPack: 1,
+    stock: 0,
+    category: 'meat',
+    description: 'Rib Eye',
+    image: '/images/Products/Bife Ancho.jpg'
+  },{
+    id: 'bife-angosto',
+    name: 'Bife angosto',
+    price: 34,
+    pricePerKg: true,
+    minPack: 1,
+    stock: 0,
+    category: 'meat',
+    description: 'Striploin',
+    image: '/images/Products/Bife Angosto.jpg'
   }
 ];
-
 export const getProductsByCategory = (category: Product['category']) => {
   return products.filter(product => product.category === category);
 };
@@ -291,3 +309,12 @@ export const getCategories = () => {
     { id: 'achuras', name: 'Offal', label: 'Achuras' }
   ];
 };
+
+
+
+
+
+
+
+
+
