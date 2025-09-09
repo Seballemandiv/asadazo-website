@@ -35,7 +35,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if ((result as any)?.error) {
       console.error('Resend error:', (result as any).error);
-      return res.status(500).json({ error: (result as any).error, message: (result as any).error?.message || 'Resend error' });
+      return res.status(500).json({ 
+        error: (result as any).error, 
+        message: (result as any).error?.message || 'Resend error',
+        details: JSON.stringify((result as any).error)
+      });
     }
     return res.status(200).json({ ok: true });
   } catch (err: any) {
