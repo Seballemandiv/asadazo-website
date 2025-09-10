@@ -14,6 +14,9 @@ export default async function handler(req, res) {
     const data = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
     const subject = data.subject || data.cut || 'Website message';
 
+    const imageName = (data as any).imageName || 'upload.jpg';
+    const imageData = (data as any).imageData as string | undefined; // data URL if provided
+
     const html = `
       <div style="font-family:Inter,Arial,sans-serif;line-height:1.5">
         <h2>New website message</h2>
@@ -21,11 +24,21 @@ export default async function handler(req, res) {
       </div>
     `;
 
+    const attachments = imageData && imageData.startsWith('data:')
+      ? [{
+          filename: imageName,
+          content: imageData.split(',')[1] || '',
+          path: undefined,
+          type: imageData.substring(5, imageData.indexOf(';')) || 'image/jpeg'
+        }]
+      : undefined;
+
     const result = await resend.emails.send({
       from: 'Expandam <Allemandi.Sebastian@expandam.nl>',
       to: [TO_EMAIL],
       subject,
-      html
+      html,
+      attachments
     });
 
     if ((result as any)?.error) {

@@ -4,6 +4,7 @@ import { UploadCloud, X, CheckCircle } from 'lucide-react';
 const OnRequest: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [imageName, setImageName] = useState<string | null>(null);
   const [form, setForm] = useState({
     cutName: '',
     fullName: '',
@@ -34,6 +35,7 @@ const OnRequest: React.FC = () => {
     const reader = new FileReader();
     reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(f);
+    setImageName(f.name || null);
     if (errors.file) setErrors({ ...errors, file: '' });
   };
 
@@ -72,7 +74,9 @@ const OnRequest: React.FC = () => {
           phone: form.phone,
           email: form.email,
           notes: form.notes || 'No additional notes',
-          imagePresent: Boolean(preview)
+          imagePresent: Boolean(preview),
+          imageData: preview,
+          imageName: imageName || undefined
         })
       });
 
@@ -81,6 +85,7 @@ const OnRequest: React.FC = () => {
       setSubmitted(true);
       setForm({ cutName: '', fullName: '', phone: '', email: '', notes: '' });
       setPreview(null);
+      setImageName(null);
 
     } catch (error) {
       console.error('Form submission failed:', error);
