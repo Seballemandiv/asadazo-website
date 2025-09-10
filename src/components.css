@@ -90,6 +90,13 @@ body::after {
 }
 
 .cart-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(233,205,155,0.3); }
+.cart-header h2 { 
+  margin: 0; 
+  font-family: "Cormorant Garamond", serif; 
+  font-size: 2.25rem; 
+  font-weight: 700; 
+  color: var(--golden-beige);
+}
 .cart-items, .checkout-form { padding: 24px 28px; overflow: auto; }
 .cart-item { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(233,205,155,0.15); }
 .item-quantity button { background: transparent; border: 1px solid rgba(233,205,155,0.5); color: var(--golden-beige); border-radius: 6px; padding: 4px; }
@@ -103,8 +110,26 @@ body::after {
 .customer-info { margin-top: 14px; border-top: 1px solid rgba(233,205,155,0.2); padding-top: 12px; }
 .customer-info .form-group { display:flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 .customer-info input, .customer-info textarea {
-  background: rgba(255,255,255,0.06); color: var(--golden-beige);
-  border: 1px solid rgba(233,205,155,0.25); border-radius: 8px; padding: 10px;
+  padding: 1rem; 
+  border: 2px solid rgba(233, 205, 155, 0.3);
+  border-radius: 12px; 
+  background: rgba(233, 205, 155, 0.1);
+  color: var(--golden-beige);
+  font-size: 16px; 
+  transition: all 0.2s ease; 
+  font-family: inherit;
+}
+.customer-info input:focus, .customer-info textarea:focus { 
+  outline: none; border-color: var(--golden-beige); 
+  background: rgba(233,205,155,0.15); box-shadow: 0 0 0 3px rgba(233,205,155,0.2);
+}
+.customer-info textarea { resize: vertical; min-height: 100px; }
+
+.order-summary h4 { 
+  margin: 0 0 8px; 
+  font-family: "Cormorant Garamond", serif; 
+  font-size: 1.5rem; 
+  font-weight: 700;
 }
 .checkout-actions {
   display: flex;
@@ -127,6 +152,8 @@ body::after {
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 @media (max-width: 640px) {
   .cart-modal { width: 100%; max-height: 100vh; border-radius: 0; }
+  .checkout-actions { flex-direction: column; gap: 12px; }
+  .checkout-actions .btn-primary, .checkout-actions .btn-secondary, .checkout-actions .btn-outline { max-width: 100%; width: 100%; }
 }
 .header {
   position: sticky;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Trash2, Plus, Minus } from 'lucide-react';
+import { X, Trash2, Plus, Minus, CheckCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { translations } from '../data/translations';
 
@@ -8,7 +8,7 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({ onClose }) => {
-  const { cart, removeFromCart, updateQuantity, getCartTotal } = useCart();
+  const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
   const [isCheckout, setIsCheckout] = useState(false);
   type DeliveryZone = 'pickup' | 'inside' | 'outside';
   const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>('inside');
@@ -22,6 +22,7 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
         ? (subtotal >= 80 ? 0 : 5)
         : 20; // outside the ring
   const total = subtotal + deliveryFee;
+  const [submitted, setSubmitted] = useState(false);
 
   const [customer, setCustomer] = useState({
     name: '',
@@ -65,11 +66,11 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
 
       if (!res.ok) throw new Error('Order submission failed');
 
-      alert('Order submitted! We will confirm shortly.');
-      onClose();
+      setSubmitted(true);
+      clearCart();
     } catch (e) {
       console.error(e);
-      alert('Failed to submit order. Please try again.');
+      window.alert('Failed to submit order. Please try again.');
     }
   };
 
@@ -234,14 +235,22 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
               </div>
             </div>
 
-            <div className="checkout-actions">
-              <button className="btn-secondary" onClick={() => setIsCheckout(false)}>
-                Back to Cart
-              </button>
-              <button className="btn-primary" onClick={handleCheckout} disabled={(deliveryZone==='outside' && subtotal < 80) || !isCustomerValid()}>
-                Place Order
-              </button>
-            </div>
+            {!submitted ? (
+              <div className="checkout-actions">
+                <button className="btn-secondary" onClick={() => setIsCheckout(false)}>
+                  Back to Cart
+                </button>
+                <button className="btn-primary" onClick={handleCheckout} disabled={(deliveryZone==='outside' && subtotal < 80) || !isCustomerValid()}>
+                  Place Order
+                </button>
+              </div>
+            ) : (
+              <div className="success-state" style={{textAlign:'center', padding:'24px 0'}}>
+                <CheckCircle size={48} />
+                <h3>Order submitted!</h3>
+                <p>We will confirm shortly via email.</p>
+              </div>
+            )}
           </div>
         )}
       </div>
