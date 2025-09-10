@@ -64,6 +64,70 @@ body::after {
 }
 
 /* Header styles */
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.cart-modal {
+  width: min(1100px, 98%);
+  max-height: 92vh;
+  overflow: hidden;
+  background: rgba(122, 51, 38, 0.1); /* match On Request card tone */
+  border: 1px solid rgba(233, 205, 155, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  color: var(--golden-beige); /* ensure text uses brand color, not pure white */
+}
+
+.cart-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(233,205,155,0.3); }
+.cart-items, .checkout-form { padding: 24px 28px; overflow: auto; }
+.cart-item { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(233,205,155,0.15); }
+.item-quantity button { background: transparent; border: 1px solid rgba(233,205,155,0.5); color: var(--golden-beige); border-radius: 6px; padding: 4px; }
+.item-total .remove-button { background: transparent; border: 1px solid rgba(233,205,155,0.4); color: #ffb0b0; border-radius: 6px; padding: 4px; }
+.cart-summary { padding: 12px 20px; border-top: 1px solid rgba(233,205,155,0.2); }
+.summary-row { display:flex; justify-content: space-between; padding: 6px 0; }
+.summary-row.total { font-weight: 700; }
+.order-summary { margin-top: 8px; border: 1px solid rgba(233,205,155,0.2); border-radius: 8px; padding: 12px; }
+.order-item { display:flex; justify-content: space-between; padding: 6px 0; }
+.order-total { margin-top: 8px; }
+.customer-info { margin-top: 14px; border-top: 1px solid rgba(233,205,155,0.2); padding-top: 12px; }
+.customer-info .form-group { display:flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.customer-info input, .customer-info textarea {
+  background: rgba(255,255,255,0.06); color: var(--golden-beige);
+  border: 1px solid rgba(233,205,155,0.25); border-radius: 8px; padding: 10px;
+}
+.checkout-actions {
+  display: flex;
+  justify-content: space-between; /* spread like On Request submit row */
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  margin: 16px 28px 28px; /* more breathing room */
+  border-top: 1px solid rgba(233,205,155,0.2);
+}
+.checkout-actions .btn-primary,
+.checkout-actions .btn-secondary,
+.checkout-actions .btn-outline {
+  min-width: 220px; /* consistent width */
+  flex: 1;
+  max-width: 260px;
+}
+.btn-primary { background: var(--malbec); color: var(--golden-beige); border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+.btn-secondary, .btn-outline { background: transparent; color: var(--golden-beige); border: 1px solid var(--golden-beige); padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (max-width: 640px) {
+  .cart-modal { width: 100%; max-height: 100vh; border-radius: 0; }
+}
 .header {
   position: sticky;
   top: 0;

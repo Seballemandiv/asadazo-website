@@ -8,7 +8,7 @@ export const products: Product[] = [
     price: 24,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 20,
     category: 'meat',
     description: 'Premium skirt steak.',
     image: '/images/Products/entrana.jpg'
@@ -19,7 +19,7 @@ export const products: Product[] = [
     price: 24,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 15,
     category: 'meat',
     description: 'Top sirloin.',
     image: '/images/Products/Colita-de-cuadril.jpg'
@@ -30,7 +30,7 @@ export const products: Product[] = [
     price: 22,
     pricePerKg: true,
     minPack: 2,
-    stock: 0,
+    stock: 25,
     category: 'meat',
     description: 'Flank steak.',
     image: '/images/Products/Vacio.jpg'
@@ -41,7 +41,7 @@ export const products: Product[] = [
     price: 26,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 12,
     category: 'meat',
     description: 'Top round.',
     image: '/images/Products/Peceto.jpg'
@@ -52,7 +52,7 @@ export const products: Product[] = [
     price: 22,
     pricePerKg: true,
     minPack: 10,
-    stock: 0,
+    stock: 30,
     category: 'meat',
     description: 'Traditional asado cut \(Costillar marcado on request\)',
     image: '/images/Products/Asado.jpg'
@@ -63,7 +63,7 @@ export const products: Product[] = [
     price: 28,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 18,
     category: 'meat',
     description: 'Strip steak, premium grilling cut',
     image: '/images/Products/Bife-de-chorizo.jpg'
@@ -74,7 +74,7 @@ export const products: Product[] = [
     price: 45,
     pricePerKg: true,
     minPack: 2.5,
-    stock: 0,
+    stock: 10,
     category: 'meat',
     description: 'Ribeye steak, marbled and juicy',
     image: '/images/Products/Ojo-de-bife.jpg'
@@ -85,7 +85,7 @@ export const products: Product[] = [
     price: 47,
     pricePerKg: true,
     minPack: 2.5,
-    stock: 0,
+    stock: 8,
     category: 'meat',
     description: 'Tenderloin, the most tender cut',
     image: '/images/Products/Bola-de-lomo.jpg'
@@ -96,7 +96,7 @@ export const products: Product[] = [
     price: 27,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 22,
     category: 'meat',
     description: 'Square cut chuck schnitzel',
     image: '/images/Products/milanesa-de-cuadrada.jpg'
@@ -107,7 +107,7 @@ export const products: Product[] = [
     price: 28,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 16,
     category: 'meat',
     description: 'Top round schnitzel.',
     image: '/images/Products/milanesa-de-nalga.jpg'
@@ -117,8 +117,8 @@ export const products: Product[] = [
     name: 'lomo-de-novillo',
     price: 58,
     pricePerKg: true,
-    minPack: 0,
-    stock: 0,
+    minPack: 1,
+    stock: 6,
     category: 'meat',
     description: 'Premium tenderloin',
     image: '/images/Products/lomo-de-novillo.jpg'
@@ -129,7 +129,7 @@ export const products: Product[] = [
     price: 21,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 14,
     category: 'meat',
     description: 'Flank steak roll.',
     image: '/images/Products/Matambre-de-novillo.jpg'
@@ -140,7 +140,7 @@ export const products: Product[] = [
     price: 34,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 9,
     category: 'meat',
     description: 'Top sirloin cap',
     image: '/images/Products/Picana.jpg'
@@ -153,7 +153,7 @@ export const products: Product[] = [
     price: 21,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 11,
     category: 'pork',
     description: 'Pork Flank steak roll',
     image: '/images/Products/Matambre-de-cerdo.jpg'
@@ -164,7 +164,7 @@ export const products: Product[] = [
     price: 19,
     pricePerKg: true,
     minPack: 2,
-    stock: 0,
+    stock: 40,
     category: 'pork',
     description: 'Pork shoulder',
     image: '/images/Products/Bondiola-de-cerdo.jpg'
@@ -175,7 +175,7 @@ export const products: Product[] = [
     price: 18,
     pricePerKg: true,
     minPack: 1,
-    stock: 0,
+    stock: 35,
     category: 'pork',
     description: 'Pork ribs',
     image: '/images/Products/Costilla-de-cerdo.jpg'
@@ -186,7 +186,7 @@ export const products: Product[] = [
     price: 24,
     pricePerKg: true,
     minPack: 2,
-    stock: 0,
+    stock: 27,
     category: 'pork',
     description: 'Pork tenderloin, lean and tender',
     image: '/images/Products/lomo-de-cerdo.jpg'
@@ -198,7 +198,7 @@ export const products: Product[] = [
     price: 18,
     pricePerKg: true,
     minPack: 0.3,
-    stock: 0,
+    stock: 19,
     category: 'sausages',
     description: 'Traditional Argentine chorizo',
     image: '/images/Products/Chorizo-criollo-argentino.jpg'
@@ -209,7 +209,7 @@ export const products: Product[] = [
     price: 18,
     pricePerKg: true,
     minPack: 0.3,
-    stock: 0,
+    stock: 13,
     category: 'sausages',
     description: 'Grilling sausages',
     image: '/images/Products/Salchicha-parrillera.jpg'
@@ -222,7 +222,7 @@ export const products: Product[] = [
     price: 18,
     pricePerKg: true,
     minPack: 0.3,
-    stock: 0,
+    stock: 17,
     category: 'achuras',
     description: 'Blood sausage, rich and flavorful',
     image: '/images/Products/morcilla-dulce.jpg'
@@ -233,7 +233,7 @@ export const products: Product[] = [
     price: 32,
     pricePerKg: true,
     minPack: 0.5,
-    stock: 0,
+    stock: 21,
     category: 'achuras',
     description: 'Small intestines.',
     image: '/images/Products/Chinchulines.jpg'
@@ -244,7 +244,7 @@ export const products: Product[] = [
     price: 18,
     pricePerKg: true,
     minPack: 0.5,
-    stock: 0,
+    stock: 7,
     category: 'achuras',
     description: 'Morcilla bombón criolla',
     image: '/images/Products/morcilla-bombon.jpg'
@@ -255,7 +255,7 @@ export const products: Product[] = [
     price: 45,
     pricePerKg: true,
     minPack: 0.5,
-    stock: 0,
+    stock: 15,
     category: 'achuras',
     description: 'Sweetbreads, a delicacy',
     image: '/images/Products/Molleja.jpg'
@@ -266,7 +266,7 @@ export const products: Product[] = [
     price: 18,
     pricePerKg: true,
     minPack: 0.5,
-    stock: 0,
+    stock: 20,
     category: 'achuras',
     description: 'cutting of black pudding wheel',
     image: '/images/Products/morcilla-rueda.jpg'

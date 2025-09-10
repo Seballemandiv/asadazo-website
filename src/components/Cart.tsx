@@ -10,25 +10,67 @@ interface CartProps {
 const Cart: React.FC<CartProps> = ({ onClose }) => {
   const { cart, removeFromCart, updateQuantity, getCartTotal } = useCart();
   const [isCheckout, setIsCheckout] = useState(false);
-  const [pickupOption, setPickupOption] = useState(false);
+  type DeliveryZone = 'pickup' | 'inside' | 'outside';
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>('inside');
   const t = translations.en;
 
-  const deliveryFee = pickupOption ? 0 : 5;
   const subtotal = getCartTotal();
+  const deliveryFee =
+    deliveryZone === 'pickup'
+      ? 0
+      : deliveryZone === 'inside'
+        ? (subtotal >= 80 ? 0 : 5)
+        : 20; // outside the ring
   const total = subtotal + deliveryFee;
 
-  const handleCheckout = () => {
-    const orderDetails = {
-      items: cart.map(item => `${item.product.name} - ${item.quantity}kg`).join('\n'),
-      total: total,
-      delivery: pickupOption ? 'Pickup' : 'Delivery',
-      email: 'allemandi.Sebastian@expandam.nl'
-    };
+  const [customer, setCustomer] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    notes: ''
+  });
 
-    const mailtoLink = `mailto:${orderDetails.email}?subject=New Order - Asadazo&body=Order Details:%0D%0A%0D%0A${orderDetails.items}%0D%0A%0D%0ATotal: €${total.toFixed(2)}%0D%0A${orderDetails.delivery}%0D%0A%0D%0APlease confirm this order.`;
-    
-    window.location.href = mailtoLink;
-    onClose();
+  const isCustomerValid = () => {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email);
+    const baseOk = customer.name.trim().length > 1 && emailOk && customer.phone.trim().length >= 6;
+    if (deliveryZone === 'pickup') return baseOk;
+    return baseOk && customer.address.trim().length >= 5;
+  };
+
+  const ORDER_API = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+    ? 'https://v0-asadazo-website.vercel.app/api/create-order'
+    : '/api/create-order';
+
+  const handleCheckout = async () => {
+    try {
+      const items = cart.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        quantity: item.quantity,
+        price: item.product.price,
+        lineTotal: item.product.price * item.quantity
+      }));
+
+      const res = await fetch(ORDER_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          totals: { subtotal, delivery: deliveryFee, total },
+          deliveryZone,
+          customer
+        })
+      });
+
+      if (!res.ok) throw new Error('Order submission failed');
+
+      alert('Order submitted! We will confirm shortly.');
+      onClose();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to submit order. Please try again.');
+    }
   };
 
   if (cart.length === 0) {
@@ -128,21 +170,28 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
             <h3>Checkout</h3>
             
             <div className="form-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={pickupOption}
-                  onChange={(e) => setPickupOption(e.target.checked)}
-                />
-                Pickup at Amsterdam Oost (Free)
-              </label>
+              <label><input type="radio" name="zone" checked={deliveryZone==='pickup'} onChange={()=>setDeliveryZone('pickup')} /> Pickup at Amsterdam Oost (Free)</label>
+            </div>
+            <div className="form-group">
+              <label><input type="radio" name="zone" checked={deliveryZone==='inside'} onChange={()=>setDeliveryZone('inside')} /> Delivery inside the ring</label>
+            </div>
+            <div className="form-group">
+              <label><input type="radio" name="zone" checked={deliveryZone==='outside'} onChange={()=>setDeliveryZone('outside')} /> Delivery outside the ring</label>
             </div>
 
-            {!pickupOption && (
+            {deliveryZone !== 'pickup' && (
               <div className="delivery-info">
-                <p>Delivery fee: €{deliveryFee}</p>
-                <p>Free delivery for orders over €80</p>
-                <p>Delivery area: Amsterdam (other areas by consultation)</p>
+                <p>Delivery fee: €{deliveryFee.toFixed(0)}</p>
+                {deliveryZone === 'inside' ? (
+                  <>
+                    <p>Free delivery for orders over €80</p>
+                    <p>Delivery area: Inside the ring</p>
+                  </>
+                ) : (
+                  <>
+                    <p>Outside the ring (Min order €80) — Delivery fee €20</p>
+                  </>
+                )}
               </div>
             )}
 
@@ -159,11 +208,37 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
               </div>
             </div>
 
+            <div className="customer-info">
+              <h4>Customer Information</h4>
+              <div className="form-group">
+                <label>Name</label>
+                <input value={customer.name} onChange={(e)=>setCustomer({...customer,name:e.target.value})} placeholder="Full name" />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input value={customer.email} onChange={(e)=>setCustomer({...customer,email:e.target.value})} placeholder="you@example.com" />
+              </div>
+              <div className="form-group">
+                <label>Phone</label>
+                <input value={customer.phone} onChange={(e)=>setCustomer({...customer,phone:e.target.value})} placeholder="06.." />
+              </div>
+              {deliveryZone !== 'pickup' && (
+                <div className="form-group">
+                  <label>Address</label>
+                  <input value={customer.address} onChange={(e)=>setCustomer({...customer,address:e.target.value})} placeholder="Street, number, city" />
+                </div>
+              )}
+              <div className="form-group">
+                <label>Notes (optional)</label>
+                <textarea rows={3} value={customer.notes} onChange={(e)=>setCustomer({...customer,notes:e.target.value})} />
+              </div>
+            </div>
+
             <div className="checkout-actions">
               <button className="btn-secondary" onClick={() => setIsCheckout(false)}>
                 Back to Cart
               </button>
-              <button className="btn-primary" onClick={handleCheckout}>
+              <button className="btn-primary" onClick={handleCheckout} disabled={(deliveryZone==='outside' && subtotal < 80) || !isCustomerValid()}>
                 Place Order
               </button>
             </div>
