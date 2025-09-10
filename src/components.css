@@ -1284,6 +1284,35 @@ body::after {
   margin: 0;
 }
 
+/* ---------- CUSTOMER DASHBOARD (reuse site look) ---------- */
+.dashboard-page { max-width: 1200px; margin: 0 auto; padding: 4rem 1rem; min-height: calc(100vh - 128px); }
+.dashboard-container { width: 100%; }
+.dashboard-header { display:flex; align-items:center; justify-content: space-between; margin-bottom: 2rem; }
+.dashboard-title { font-family: "Cormorant Garamond", serif; font-size: 2.5rem; font-weight: 700; color: var(--golden-beige); margin: 0; }
+.logout-button { background: transparent; color: var(--golden-beige); border: 1px solid var(--golden-beige); padding: 0.5rem 0.75rem; border-radius: 8px; display:flex; align-items:center; gap:8px; cursor:pointer; }
+.dashboard-tabs { display:flex; justify-content:center; gap: 0.75rem; margin-bottom: 2rem; }
+.tab-button { background: transparent; border: 2px solid rgba(233,205,155,0.3); color: var(--golden-beige); padding: 0.75rem 1.25rem; border-radius: 10px; cursor:pointer; display:flex; align-items:center; gap:8px; }
+.tab-button.active { border-color: var(--golden-beige); background: rgba(233,205,155,0.08); }
+.orders-section h2 { font-family: "Cormorant Garamond", serif; font-size: 2rem; margin: 0 0 1rem; }
+.orders-list { display:grid; gap: 1rem; }
+.order-card { background: rgba(122,51,38,0.1); border: 1px solid rgba(233,205,155,0.3); border-radius: 16px; padding: 1rem; backdrop-filter: blur(8px); }
+.order-header { display:flex; align-items:center; justify-content: space-between; margin-bottom: 0.75rem; }
+.order-info h3 { margin:0; font-size: 1.25rem; }
+.order-date { opacity: 0.8; margin: 0; }
+.order-items { display:grid; grid-template-columns: 1fr auto auto; gap: 8px; padding: 0.5rem 0; border-top: 1px solid rgba(233,205,155,0.15); border-bottom: 1px solid rgba(233,205,155,0.15); }
+.order-item { display: contents; }
+.order-item span { padding: 4px 0; }
+.status-badge { border:1px solid var(--golden-beige); padding: 2px 8px; border-radius: 999px; text-transform: capitalize; }
+.status-badge.pending { background: rgba(233,205,155,0.08); }
+.order-footer { display:flex; align-items:center; justify-content: space-between; margin-top: 0.5rem; }
+.empty-state { text-align:center; opacity: 0.9; }
+.empty-state h3 { margin: 0.5rem 0 0.25rem; }
+
+@media (max-width: 768px) {
+  .order-items { grid-template-columns: 1fr; }
+  .dashboard-title { font-size: 2rem; }
+}
+
 .admin-tabs {
   display: flex;
   justify-content: center;
