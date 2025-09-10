@@ -62,41 +62,26 @@ const OnRequest: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Formspree Integration
-      const formspreeEndpoint = 'https://formspree.io/f/mldwllla';
-      
-      const response = await fetch(formspreeEndpoint, {
+      const response = await fetch('/api/send-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          subject: `New cut request: ${form.cutName}`,
           cutName: form.cutName,
           fullName: form.fullName,
           phone: form.phone,
           email: form.email,
           notes: form.notes || 'No additional notes',
-          _replyto: form.email,
-          _subject: `New Cut Request: ${form.cutName}`,
-          // This will forward emails to your specified address
-          _cc: 'allemandi.Sebastian@expandam.nl'
-        }),
+          imagePresent: Boolean(preview)
+        })
       });
 
-      if (response.ok) {
-        setSubmitted(true);
-        setForm({ cutName: '', fullName: '', phone: '', email: '', notes: '' });
-        setPreview(null);
-      } else {
-        throw new Error('Form submission failed');
-      }
-      
-      // Option 2: Simulate submission (for testing without email service)
-      // await new Promise(resolve => setTimeout(resolve, 1000));
-      // setSubmitted(true);
-      // setForm({ cutName: '', fullName: '', phone: '', email: '', notes: '' });
-      // setPreview(null);
-      
+      if (!response.ok) throw new Error('Form submission failed');
+
+      setSubmitted(true);
+      setForm({ cutName: '', fullName: '', phone: '', email: '', notes: '' });
+      setPreview(null);
+
     } catch (error) {
       console.error('Form submission failed:', error);
       setErrors({ general: 'Failed to submit request. Please try again later.' });
