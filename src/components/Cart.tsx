@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Trash2, Plus, Minus, CheckCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import type { Order } from '../types';
 import { translations } from '../data/translations';
 
 interface CartProps {
@@ -23,6 +24,7 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
         : 20; // outside the ring
   const total = subtotal + deliveryFee;
   const [submitted, setSubmitted] = useState(false);
+  const ORDERS_STORAGE_KEY = 'asadazo_orders';
 
   const [customer, setCustomer] = useState({
     name: '',
@@ -65,6 +67,24 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
       });
 
       if (!res.ok) throw new Error('Order submission failed');
+
+      // Persist order locally so it shows in customer dashboard
+      try {
+        const existing: Order[] = JSON.parse(localStorage.getItem(ORDERS_STORAGE_KEY) || '[]');
+        const newOrder: Order = {
+          id: String(Date.now()),
+          userId: 'guest',
+          items: cart,
+          total,
+          deliveryFee,
+          deliveryAddress: { street: customer.address || '', city: '', postalCode: '', country: 'Netherlands' },
+          pickupOption: deliveryZone === 'pickup',
+          status: 'pending',
+          createdAt: new Date()
+        } as any;
+        const updated = [newOrder, ...existing];
+        localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(updated));
+      } catch {}
 
       setSubmitted(true);
       clearCart();

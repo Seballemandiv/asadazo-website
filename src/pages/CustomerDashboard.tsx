@@ -1,83 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Package, CreditCard, User, Plus, Edit, Trash2, MapPin, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import type { Order, PaymentMethod } from '../types';
 import Toast from '../components/Toast';
 
-// Mock data
-const MOCK_ORDERS: Order[] = [
-  {
-    id: '1',
-    userId: '2',
-    items: [
-      {
-        product: {
-          id: '1',
-          name: 'Entraña',
-          price: 25.99,
-          pricePerKg: true,
-          minPack: 0.5,
-          stock: 10,
-          category: 'meat'
-        },
-        quantity: 1
-      }
-    ],
-    total: 25.99,
-    deliveryFee: 5.00,
-    deliveryAddress: {
-      street: '123 Main St',
-      city: 'Amsterdam',
-      postalCode: '1000 AA',
-      country: 'Netherlands'
-    },
-    status: 'delivered',
-    createdAt: new Date('2024-01-20'),
-    deliveryDate: new Date('2024-01-22'),
-    paymentMethod: {
-      id: '1',
-      type: 'card',
-      last4: '1234',
-      brand: 'Visa',
-      isDefault: true
-    }
-  },
-  {
-    id: '2',
-    userId: '2',
-    items: [
-      {
-        product: {
-          id: '2',
-          name: 'Vacío',
-          price: 28.99,
-          pricePerKg: true,
-          minPack: 0.5,
-          stock: 8,
-          category: 'meat'
-        },
-        quantity: 1.5
-      }
-    ],
-    total: 43.49,
-    deliveryFee: 5.00,
-    deliveryAddress: {
-      street: '123 Main St',
-      city: 'Amsterdam',
-      postalCode: '1000 AA',
-      country: 'Netherlands'
-    },
-    status: 'preparing',
-    createdAt: new Date('2024-01-25'),
-    paymentMethod: {
-      id: '1',
-      type: 'card',
-      last4: '1234',
-      brand: 'Visa',
-      isDefault: true
-    }
-  }
-];
+// Orders are stored locally for now
+const ORDERS_STORAGE_KEY = 'asadazo_orders';
 
 const MOCK_PAYMENT_METHODS: PaymentMethod[] = [
   {
@@ -134,6 +62,7 @@ const tabs: Array<{ key: 'orders' | 'payment' | 'profile' | 'logout'; label: str
 
 const CustomerDashboard = () => {
   const { logout } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState<'orders' | 'payment' | 'profile' | 'logout'>('orders');
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [newPaymentMethod, setNewPaymentMethod] = useState<PaymentFormData>({
@@ -199,6 +128,13 @@ const CustomerDashboard = () => {
     logout();
   }
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(ORDERS_STORAGE_KEY);
+      if (saved) setOrders(JSON.parse(saved));
+    } catch {}
+  }, []);
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-container">
@@ -237,7 +173,7 @@ const CustomerDashboard = () => {
           {activeTab === 'orders' && (
             <div id="panel-orders" role="tabpanel" aria-labelledby="tab-orders" className="orders-section">
               <h2>My Orders</h2>
-              {MOCK_ORDERS.length === 0 ? (
+              {orders.length === 0 ? (
                 <div className="empty-state">
                   <Package size={48} />
                   <h3>No orders yet</h3>
@@ -245,7 +181,7 @@ const CustomerDashboard = () => {
                 </div>
               ) : (
                 <div className="orders-list">
-                  {MOCK_ORDERS.map(order => (
+                  {orders.map(order => (
                     <div key={order.id} className="order-card">
                       <div className="order-header">
                         <div className="order-info">
