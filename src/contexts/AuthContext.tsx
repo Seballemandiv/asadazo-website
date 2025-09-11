@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { Resend } from 'resend';
 import type { ReactNode } from 'react';
 import type { User } from '../types';
 
@@ -10,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (name: string, email: string, password: string, phone: string) => Promise<boolean>;
+  requestEmailVerification?: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -109,11 +111,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Add to mock users array
     MOCK_USERS.push(newUser);
 
-    // Save to localStorage and set as current user
-    localStorage.setItem('asadazo_user', JSON.stringify(newUser));
-    setUser(newUser);
+    // Save to localStorage (unverified by default) and set as current user
+    localStorage.setItem('asadazo_user', JSON.stringify({ ...newUser, verified: false }));
+    setUser({ ...newUser, verified: false } as unknown as User);
     
     return true;
+  };
+
+  const requestEmailVerification = async (email: string) => {
+    try {
+      // Call our API route that sends a verification email
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: 'Verify your Asadazo account',
+          email,
+          message: `Please confirm your email by replying to this message.`,
+        })
+      });
+    } catch (e) {
+      console.error('Failed to send verification email', e);
+    }
   };
 
   const value: AuthContextType = {
@@ -123,7 +142,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loading,
     login,
     logout,
-    register
+    register,
+    requestEmailVerification
   };
 
   return (

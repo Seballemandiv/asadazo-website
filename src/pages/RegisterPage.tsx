@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { User, Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
@@ -18,6 +18,8 @@ const RegisterPage: React.FC = () => {
   
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({

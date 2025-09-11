@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { User, Lock, Eye, EyeOff, ChevronDown } from 'lucide-react';
@@ -14,6 +14,8 @@ const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -111,33 +113,7 @@ const LoginPage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="demo-credentials-section">
-            <button 
-              className="demo-toggle-btn"
-              onClick={() => setShowDemoCredentials(!showDemoCredentials)}
-            >
-              <span>Demo Credentials</span>
-              <ChevronDown 
-                size={16} 
-                className={`demo-chevron ${showDemoCredentials ? 'rotated' : ''}`}
-              />
-            </button>
-            
-            {showDemoCredentials && (
-              <div className="demo-credentials">
-                <div className="credential-group">
-                  <h4>Admin Account:</h4>
-                  <p><strong>Email:</strong> admin@asadazo.com</p>
-                  <p><strong>Password:</strong> admin123</p>
-                </div>
-                <div className="credential-group">
-                  <h4>Customer Account:</h4>
-                  <p><strong>Email:</strong> customer@example.com</p>
-                  <p><strong>Password:</strong> customer123</p>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Demo credentials removed for production */}
         </div>
       </div>
     </div>
