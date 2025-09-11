@@ -129,10 +129,24 @@ const CustomerDashboard = () => {
   }
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(ORDERS_STORAGE_KEY);
-      if (saved) setOrders(JSON.parse(saved));
-    } catch {}
+    const load = async () => {
+      try {
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.orders)) {
+            setOrders(data.orders);
+            return;
+          }
+        }
+      } catch {}
+      // Fallback to localStorage if not logged in or API not available
+      try {
+        const saved = localStorage.getItem(ORDERS_STORAGE_KEY);
+        if (saved) setOrders(JSON.parse(saved));
+      } catch {}
+    };
+    load();
   }, []);
 
   return (

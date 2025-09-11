@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { X, Trash2, Plus, Minus, CheckCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import type { Order } from '../types';
@@ -10,6 +11,7 @@ interface CartProps {
 
 const Cart: React.FC<CartProps> = ({ onClose }) => {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const [isCheckout, setIsCheckout] = useState(false);
   type DeliveryZone = 'pickup' | 'inside' | 'outside';
   const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>('inside');
@@ -68,8 +70,21 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
 
       if (!res.ok) throw new Error('Order submission failed');
 
-      // Persist order locally so it shows in customer dashboard
+      // Persist order: if logged-in, save to server; always mirror locally for fallback
       try {
+        if (isAuthenticated) {
+          await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: cart,
+              total,
+              deliveryFee,
+              deliveryAddress: { street: customer.address || '', city: '', postalCode: '', country: 'Netherlands' },
+              pickupOption: deliveryZone === 'pickup'
+            })
+          });
+        }
         const existing: Order[] = JSON.parse(localStorage.getItem(ORDERS_STORAGE_KEY) || '[]');
         const newOrder: Order = {
           id: String(Date.now()),
