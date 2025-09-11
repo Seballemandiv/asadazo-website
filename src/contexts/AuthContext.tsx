@@ -15,7 +15,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock admin user
+// Mock admin user for development/testing
 const MOCK_ADMIN: User = {
   id: '1',
   email: 'admin@asadazo.com',
@@ -26,95 +26,82 @@ const MOCK_ADMIN: User = {
   lastLogin: new Date()
 };
 
-// Mock users array
-const MOCK_USERS: User[] = [
-  MOCK_ADMIN,
-  {
-    id: '2',
-    email: 'customer@example.com',
-    password: 'customer123',
-    name: 'John Doe',
-    role: 'customer',
-    phone: '+31 6 12345678',
-    createdAt: new Date('2024-01-15'),
-    lastLogin: new Date()
-  }
-];
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session in localStorage
-    const savedUser = localStorage.getItem('asadazo_user');
-    if (savedUser) {
+    // Check for existing session via API
+    const checkSession = async () => {
       try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
+        const response = await fetch('/api/me');
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
       } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('asadazo_user');
+        console.error('Session check error:', error);
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    
+    checkSession();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-    // Find user in mock data
-    const foundUser = MOCK_USERS.find(u => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      // Update last login
-      foundUser.lastLogin = new Date();
-      
-      // Save to localStorage
-      localStorage.setItem('asadazo_user', JSON.stringify(foundUser));
-      setUser(foundUser);
-      return true;
+      if (response.ok) {
+        // Session cookie is set automatically by the API
+        // Get user data from /api/me
+        const userResponse = await fetch('/api/me');
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    
-    return false;
   };
 
   const logout = () => {
+    // Clear session cookie by calling logout endpoint
+    fetch('/api/logout', { method: 'POST' }).catch(console.error);
     localStorage.removeItem('asadazo_user');
     setUser(null);
   };
 
   const register = async (name: string, email: string, password: string, phone: string): Promise<boolean> => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, phone })
+      });
 
-    // Check if user already exists
-    const existingUser = MOCK_USERS.find(u => u.email === email);
-    if (existingUser) {
+      if (response.ok) {
+        // Registration successful, user is automatically logged in
+        const userResponse = await fetch('/api/me');
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          setUser(userData);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Registration error:', error);
       return false;
     }
-
-    // Create new customer user
-    const newUser: User = {
-      id: (MOCK_USERS.length + 1).toString(),
-      email,
-      password,
-      name,
-      role: 'customer',
-      phone,
-      createdAt: new Date(),
-      lastLogin: new Date()
-    };
-
-    // Add to mock users array
-    MOCK_USERS.push(newUser);
-
-    // Save to localStorage (unverified by default) and set as current user
-    localStorage.setItem('asadazo_user', JSON.stringify({ ...newUser, verified: false }));
-    setUser({ ...newUser, verified: false } as unknown as User);
-    
-    return true;
   };
 
   const requestEmailVerification = async (email: string) => {
