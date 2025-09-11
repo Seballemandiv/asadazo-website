@@ -126,7 +126,7 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <nav className="mobile-nav">
+        <nav className="mobile-nav open">
           <Link to="/" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
           <Link to="/products" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Products</Link>
           <Link to="/about" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>

@@ -385,6 +385,7 @@ body::after {
   border: none;
   cursor: pointer;
   padding: 0.5rem;
+  z-index: 1001;
 }
 
 .mobile-menu-btn span {
@@ -410,6 +411,7 @@ body::after {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   padding: 1rem;
   min-height: calc(100vh - 64px);
+  z-index: 1000;
 }
 
 .mobile-nav.open {
