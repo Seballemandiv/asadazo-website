@@ -1,7 +1,8 @@
 // @ts-nocheck
 import { kv, kvUsersKey } from './_kv';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
+
+export const config = { runtime: 'nodejs' };
 
 export default async function handler(req, res) {
   // Basic CORS support
@@ -20,7 +21,7 @@ export default async function handler(req, res) {
 
     const hashed = await bcrypt.hash(password, 10);
     const user = {
-      id: crypto.randomUUID(),
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2),
       name,
       email: email.toLowerCase(),
       phone: phone || '',

@@ -2,6 +2,8 @@
 import jwt from 'jsonwebtoken';
 import { kv, kvUserOrdersKey } from './_kv';
 
+export const config = { runtime: 'nodejs' };
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 function getUserFromReq(req) {

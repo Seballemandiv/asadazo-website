@@ -3,6 +3,8 @@ import { kv, kvUsersKey } from './_kv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+export const config = { runtime: 'nodejs' };
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export default async function handler(req, res) {
