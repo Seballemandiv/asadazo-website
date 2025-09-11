@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { Resend } from 'resend';
 import type { ReactNode } from 'react';
 import type { User } from '../types';
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Lock, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,7 +9,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showDemoCredentials, setShowDemoCredentials] = useState(false);
+  // Demo credentials UI removed
   
   const { login } = useAuth();
   const navigate = useNavigate();
