@@ -26,7 +26,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <div className="product-card">
       <div className="product-image">
-        <img src={product.image || '/placeholder-meat.jpg'} alt={product.name} />
+        <img
+          src={product.image || '/images/Products/Asado.jpg'}
+          alt={product.name}
+          loading="lazy"
+          onError={(e) => {
+            const target = e.currentTarget as HTMLImageElement;
+            if (target.src.endsWith('/images/Products/Asado.jpg')) return;
+            target.src = '/images/Products/Asado.jpg';
+          }}
+        />
         <div className="product-overlay">
           {!isOutOfStock ? (
             <div className="add-to-cart-overlay">
