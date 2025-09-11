@@ -18,8 +18,8 @@ export default async function handler(req, res) {
     const token = match[1];
     const payload = jwt.verify(token, JWT_SECRET);
     return res.status(200).json({ user: { id: payload.sub, email: payload.email, role: payload.role } });
-  } catch {
-    return res.status(200).json({ user: null });
+  } catch (e) {
+    return res.status(200).json({ user: null, message: e?.message || null });
   }
 }
 

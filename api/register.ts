@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, user: { ...user, passwordHash: undefined } });
   } catch (e) {
     console.error('register error', e);
-    return res.status(500).json({ error: 'Registration failed' });
+    return res.status(500).json({ error: 'Registration failed', message: e?.message || null });
   }
 }
 

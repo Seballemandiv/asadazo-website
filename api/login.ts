@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (e) {
     console.error('login error', e);
-    return res.status(500).json({ error: 'Login failed' });
+    return res.status(500).json({ error: 'Login failed', message: e?.message || null });
   }
 }
 
