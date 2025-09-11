@@ -15,16 +15,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock admin user for development/testing
-const MOCK_ADMIN: User = {
-  id: '1',
-  email: 'admin@asadazo.com',
-  password: 'admin123',
-  name: 'Admin User',
-  role: 'admin',
-  createdAt: new Date('2024-01-01'),
-  lastLogin: new Date()
-};
+// (removed unused MOCK_ADMIN)
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
