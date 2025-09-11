@@ -1,6 +1,6 @@
 // @ts-nocheck
 import jwt from 'jsonwebtoken';
-import { kv } from './_kv';
+import { kv } from './_kv.js';
 
 export const config = { runtime: 'nodejs' };
 

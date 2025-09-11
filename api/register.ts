@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { kv, kvUsersKey } from './_kv';
+import { kv, kvUsersKey } from './_kv.js';
 import bcrypt from 'bcryptjs';
 
 export const config = { runtime: 'nodejs' };

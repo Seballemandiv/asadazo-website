@@ -1,6 +1,6 @@
 // @ts-nocheck
 import jwt from 'jsonwebtoken';
-import { kv, kvUserOrdersKey } from './_kv';
+import { kv, kvUserOrdersKey } from './_kv.js';
 
 export const config = { runtime: 'nodejs' };
 
