@@ -94,6 +94,44 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
     }
   };
 
+  // After successful submission we want to show a confirmation message
+  if (submitted) {
+    const deliveryText =
+      deliveryZone === 'pickup'
+        ? 'Pickup at Amsterdam Oost'
+        : deliveryZone === 'inside'
+          ? 'Delivery inside the ring'
+          : 'Delivery outside the ring';
+
+    return (
+      <div className="cart-overlay">
+        <div className="cart-modal">
+          <div className="cart-header">
+            <h2>{t.cart.title}</h2>
+            <button className="close-button" onClick={onClose}>
+              <X size={24} />
+            </button>
+          </div>
+          <div className="cart-empty" style={{textAlign:'center'}}>
+            <CheckCircle size={48} />
+            <h3>Your order is under review</h3>
+            <p>We will contact you regarding the delivery and payment options.</p>
+            <div className="order-summary" style={{marginTop: '1rem'}}>
+              <h4>Details</h4>
+              <div className="order-item"><span>Name</span><span>{customer.name || '-'}</span></div>
+              <div className="order-item"><span>Email</span><span>{customer.email || '-'}</span></div>
+              <div className="order-item"><span>Phone</span><span>{customer.phone || '-'}</span></div>
+              <div className="order-item"><span>Delivery</span><span>{deliveryText}</span></div>
+            </div>
+            <button className="btn-primary" onClick={onClose} style={{marginTop:'1rem'}}>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (cart.length === 0) {
     return (
       <div className="cart-overlay">
@@ -264,13 +302,7 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
                   Place Order
                 </button>
               </div>
-            ) : (
-              <div className="success-state" style={{textAlign:'center', padding:'24px 0'}}>
-                <CheckCircle size={48} />
-                <h3>Order submitted!</h3>
-                <p>We will confirm shortly via email.</p>
-              </div>
-            )}
+            ) : null}
           </div>
         )}
       </div>
