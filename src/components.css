@@ -1407,15 +1407,29 @@ body::after {
 }
 
 .login-btn:hover:not(:disabled) {
-  background: rgba(122, 51, 38, 0.8);
+  background: rgba(122, 51, 38, 0.9);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(122, 51, 38, 0.3);
 }
 
 .login-btn:disabled {
-  opacity: 0.6;
+  background: var(--dark-brown);
+  opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Centered checkbox styling */
+.login-form .form-group:last-child {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.login-form .form-group:last-child label {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .login-footer {

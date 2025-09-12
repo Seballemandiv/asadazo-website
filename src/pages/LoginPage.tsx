@@ -95,8 +95,8 @@ const LoginPage: React.FC = () => {
             {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
           
-          <div className="form-group" style={{ marginTop: '0.5rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="form-group">
+            <label>
               <input type="checkbox" checked={remember} onChange={(e)=>setRemember(e.target.checked)} />
               Remember my email on this device
             </label>

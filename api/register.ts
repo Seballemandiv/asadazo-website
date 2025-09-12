@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { kv, kvUsersKey } from './_kv.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export const config = { runtime: 'nodejs' };
 
@@ -33,6 +34,16 @@ export default async function handler(req, res) {
     };
 
     await kv.set(kvUsersKey(email), user);
+    
+    // Auto-login after registration: create JWT and set session cookie
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET || 'fallback-secret',
+      { expiresIn: '7d' }
+    );
+    
+    res.setHeader('Set-Cookie', `session=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${7 * 24 * 60 * 60}`);
+    
     return res.status(200).json({ ok: true, user: { ...user, passwordHash: undefined } });
   } catch (e) {
     console.error('register error', e);
