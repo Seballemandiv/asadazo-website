@@ -136,7 +136,7 @@ body::after {
   justify-content: space-between; /* spread like On Request submit row */
   align-items: center;
   gap: 16px;
-  padding: 20px 28px 28px; /* Added top padding for better spacing */
+  padding: 20px 28px 40px; /* Increased bottom padding to prevent touching frame */
   margin: 0; /* Remove margin to use padding instead */
   border-top: 1px solid rgba(233,205,155,0.2);
 }
