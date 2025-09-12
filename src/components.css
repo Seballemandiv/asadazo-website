@@ -77,7 +77,7 @@ body::after {
 
 .cart-modal {
   width: min(1100px, 98%);
-  max-height: 92vh;
+  max-height: 90vh; /* Reduced to ensure space for buttons */
   overflow: hidden;
   background: rgba(122, 51, 38, 0.15); /* Increased opacity for better readability */
   border: 1px solid rgba(233, 205, 155, 0.4); /* Slightly more visible border */
@@ -166,8 +166,8 @@ body::after {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  padding: 2rem 0 0 0; /* Match sign-in form spacing */
-  margin: 0;
+  padding: 2rem 2.5rem 2.5rem 2.5rem; /* Proper spacing all around */
+  margin-top: auto; /* Push buttons to bottom of flex container */
   border-top: 1px solid rgba(233,205,155,0.2);
 }
 .cart-actions .btn-primary,
