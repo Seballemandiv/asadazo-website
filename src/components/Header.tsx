@@ -38,7 +38,7 @@ const Header = () => {
       <div className="header-container">
         {/* Logo */}
         <div className="header-logo">
-          <img src="/NEW_LOGO" alt="Asadazo" />
+          <img src="/images/NEW_LOGO.png" alt="Asadazo" />
         </div>
 
         {/* Desktop Navigation */}
