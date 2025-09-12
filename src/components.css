@@ -1391,9 +1391,9 @@ body::after {
 .login-form .login-btn {
   width: 100%;
   padding: 1rem;
-  background: var(--dark-brown) !important;
+  background: #7a3326 !important;
   color: var(--golden-beige) !important;
-  border: none;
+  border: none !important;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
@@ -1403,34 +1403,49 @@ body::after {
 }
 
 .login-form .login-btn:hover:not(:disabled) {
-  background: rgba(122, 51, 38, 0.9) !important;
+  background: #7a3326 !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(122, 51, 38, 0.3);
 }
 
 .login-form .login-btn:disabled {
-  background: var(--dark-brown) !important;
-  opacity: 0.7;
+  background: #7a3326 !important;
+  opacity: 0.7 !important;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Centered checkbox styling */
+/* Centered checkbox styling - Force override all conflicting styles */
 .login-form .form-group:last-child {
-  text-align: center;
-  margin-top: 1rem;
+  text-align: center !important;
+  margin-top: 1rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
 }
 
 .login-form .form-group:last-child label {
   display: flex !important;
   align-items: center !important;
-  gap: 8px;
+  gap: 8px !important;
   justify-content: center !important;
-  width: auto;
+  width: auto !important;
   margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-size: 14px !important;
+  color: var(--golden-beige) !important;
+}
+
+.login-form .form-group:last-child input[type="checkbox"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
 }
 
 .login-footer {
