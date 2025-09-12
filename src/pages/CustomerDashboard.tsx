@@ -62,7 +62,7 @@ const tabs: Array<{ key: 'orders' | 'payment' | 'profile' | 'logout'; label: str
 ];
 
 const CustomerDashboard = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState<'orders' | 'payment' | 'profile' | 'logout'>('orders');
