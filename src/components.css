@@ -124,6 +124,7 @@ body::after {
   font-weight: 700; 
   color: var(--golden-beige);
 }
+.cart-empty { padding: 24px 28px; }
 .cart-items { padding: 24px 28px; overflow: auto; }
 .checkout-form { 
   padding: 2.5rem 2.5rem 0 2.5rem; /* Remove bottom padding, let actions handle it */

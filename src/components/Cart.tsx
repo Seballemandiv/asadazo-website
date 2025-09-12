@@ -159,9 +159,11 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
           </div>
           <div className="cart-empty">
             <p>{t.cart.empty}</p>
-            <button className="btn-primary" onClick={onClose}>
-              {t.cart.continue}
-            </button>
+            <div className="cart-actions">
+              <button className="btn-primary" onClick={onClose}>
+                {t.cart.continue}
+              </button>
+            </div>
           </div>
         </div>
       </div>
