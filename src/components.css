@@ -79,7 +79,7 @@ body::after {
   width: min(1100px, 98%);
   max-height: 90vh; /* Reduced to ensure space for buttons */
   overflow: hidden;
-  background: rgba(122, 51, 38, 0.15); /* Increased opacity for better readability */
+  background: rgba(122, 51, 38, 0.25); /* Further increased opacity for better readability */
   border: 1px solid rgba(233, 205, 155, 0.4); /* Slightly more visible border */
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
