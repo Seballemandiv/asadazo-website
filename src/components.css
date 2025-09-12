@@ -78,7 +78,7 @@ body::after {
 .cart-modal {
   width: min(1100px, 98%);
   max-height: 90vh; /* Reduced to ensure space for buttons */
-  overflow: hidden;
+  overflow: auto;
   background: rgba(122, 51, 38, 0.25); /* Further increased opacity for better readability */
   border: 1px solid rgba(233, 205, 155, 0.4); /* Slightly more visible border */
   border-radius: 16px;
@@ -87,6 +87,33 @@ body::after {
   display: flex;
   flex-direction: column;
   color: var(--golden-beige); /* ensure text uses brand color, not pure white */
+}
+
+/* Custom scrollbar styling for cart modal */
+.cart-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cart-modal::-webkit-scrollbar-track {
+  background: rgba(233, 205, 155, 0.1);
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.cart-modal::-webkit-scrollbar-thumb {
+  background: rgba(233, 205, 155, 0.4);
+  border-radius: 4px;
+  border: 1px solid rgba(233, 205, 155, 0.2);
+}
+
+.cart-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(233, 205, 155, 0.6);
+}
+
+/* For Firefox */
+.cart-modal {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(233, 205, 155, 0.4) rgba(233, 205, 155, 0.1);
 }
 
 .cart-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(233,205,155,0.3); }
