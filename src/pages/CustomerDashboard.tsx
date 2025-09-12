@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Package, CreditCard, User, Plus, Edit, Trash2, MapPin, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import type { Order, PaymentMethod } from '../types';
@@ -62,6 +63,7 @@ const tabs: Array<{ key: 'orders' | 'payment' | 'profile' | 'logout'; label: str
 
 const CustomerDashboard = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState<'orders' | 'payment' | 'profile' | 'logout'>('orders');
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
@@ -126,6 +128,8 @@ const CustomerDashboard = () => {
   // Handle logout tab
   if (activeTab === 'logout') {
     logout();
+    navigate('/');
+    return null;
   }
 
   useEffect(() => {
