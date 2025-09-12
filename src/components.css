@@ -99,7 +99,7 @@ body::after {
 }
 .cart-items { padding: 24px 28px; overflow: auto; }
 .checkout-form { 
-  padding: 2.5rem; 
+  padding: 2.5rem 2.5rem 0 2.5rem; /* Remove bottom padding, let actions handle it */
   overflow: auto; 
   background: rgba(122, 51, 38, 0.1);
   border: 1px solid rgba(233, 205, 155, 0.3);
@@ -183,7 +183,7 @@ body::after {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  padding: 2rem 0 0 0; /* Match sign-in form spacing */
+  padding: 2rem 2.5rem 2.5rem 2.5rem; /* Add all padding to actions like cart-actions */
   margin: 0;
   border-top: 1px solid rgba(233,205,155,0.2);
 }
