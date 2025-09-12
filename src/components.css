@@ -97,7 +97,16 @@ body::after {
   font-weight: 700; 
   color: var(--golden-beige);
 }
-.cart-items, .checkout-form { padding: 24px 28px; overflow: auto; }
+.cart-items { padding: 24px 28px; overflow: auto; }
+.checkout-form { 
+  padding: 2.5rem; 
+  overflow: auto; 
+  background: rgba(122, 51, 38, 0.1);
+  border: 1px solid rgba(233, 205, 155, 0.3);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  margin: 1rem;
+}
 .cart-item { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(233,205,155,0.15); }
 .item-quantity button { background: transparent; border: 1px solid rgba(233,205,155,0.5); color: var(--golden-beige); border-radius: 6px; padding: 4px; }
 .item-total .remove-button { background: transparent; border: 1px solid rgba(233,205,155,0.4); color: #ffb0b0; border-radius: 6px; padding: 4px; }
@@ -107,21 +116,42 @@ body::after {
 .order-summary { margin-top: 8px; border: 1px solid rgba(233,205,155,0.2); border-radius: 8px; padding: 12px; }
 .order-item { display:flex; justify-content: space-between; padding: 6px 0; }
 .order-total { margin-top: 8px; }
-.customer-info { margin-top: 14px; border-top: 1px solid rgba(233,205,155,0.2); padding-top: 12px; }
-.customer-info .form-group { display:flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.customer-info { 
+  margin-top: 1.5rem; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.5rem; 
+}
+.customer-info .form-group { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.5rem; 
+}
+.customer-info label { 
+  font-weight: 600; 
+  color: var(--golden-beige); 
+  font-size: 14px; 
+}
 .customer-info input, .customer-info textarea {
-  padding: 1rem; 
+  width: 100%;
+  padding: 1rem;
   border: 2px solid rgba(233, 205, 155, 0.3);
-  border-radius: 12px; 
+  border-radius: 12px;
   background: rgba(233, 205, 155, 0.1);
   color: var(--golden-beige);
-  font-size: 16px; 
-  transition: all 0.2s ease; 
+  font-size: 16px;
+  transition: all 0.2s ease;
   font-family: inherit;
 }
 .customer-info input:focus, .customer-info textarea:focus { 
-  outline: none; border-color: var(--golden-beige); 
-  background: rgba(233,205,155,0.15); box-shadow: 0 0 0 3px rgba(233,205,155,0.2);
+  outline: none; 
+  border-color: var(--golden-beige); 
+  background: rgba(233,205,155,0.15); 
+  box-shadow: 0 0 0 3px rgba(233,205,155,0.2);
+}
+.customer-info input::placeholder, .customer-info textarea::placeholder {
+  color: var(--golden-beige);
+  opacity: 0.6;
 }
 .customer-info textarea { resize: vertical; min-height: 100px; }
 
@@ -131,21 +161,38 @@ body::after {
   font-size: 1.5rem; 
   font-weight: 700;
 }
+.cart-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0 0 0; /* Match sign-in form spacing */
+  margin: 0;
+  border-top: 1px solid rgba(233,205,155,0.2);
+}
+.cart-actions .btn-primary,
+.cart-actions .btn-secondary,
+.cart-actions .btn-outline {
+  flex: 1;
+  max-width: none;
+  min-width: auto;
+}
+
 .checkout-actions {
   display: flex;
-  justify-content: space-between; /* spread like On Request submit row */
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  padding: 20px 28px 40px; /* Increased bottom padding to prevent touching frame */
-  margin: 0; /* Remove margin to use padding instead */
+  gap: 1rem;
+  padding: 2rem 0 0 0; /* Match sign-in form spacing */
+  margin: 0;
   border-top: 1px solid rgba(233,205,155,0.2);
 }
 .checkout-actions .btn-primary,
 .checkout-actions .btn-secondary,
 .checkout-actions .btn-outline {
-  min-width: 220px; /* consistent width */
   flex: 1;
-  max-width: 260px;
+  max-width: none;
+  min-width: auto;
 }
 .btn-primary { 
   background: #7a3326 !important; /* Use same malbec color as sign-in buttons */
@@ -183,7 +230,8 @@ body::after {
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 @media (max-width: 640px) {
   .cart-modal { width: 100%; max-height: 100vh; border-radius: 0; }
-  .checkout-actions { flex-direction: column; gap: 12px; }
+  .cart-actions, .checkout-actions { flex-direction: column; gap: 12px; }
+  .cart-actions .btn-primary, .cart-actions .btn-secondary, .cart-actions .btn-outline,
   .checkout-actions .btn-primary, .checkout-actions .btn-secondary, .checkout-actions .btn-outline { max-width: 100%; width: 100%; }
 }
 .header {
