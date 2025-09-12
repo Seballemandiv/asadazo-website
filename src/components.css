@@ -1162,6 +1162,29 @@ body::after {
 .contact-form .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .contact-form label { font-weight: 600; color: var(--golden-beige); font-size: 14px; }
 
+/* ---------- FAQ (match other tabs) ---------- */
+.section#faq { background: transparent; }
+.faq-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.faq-card {
+  background: rgba(122, 51, 38, 0.1);
+  border: 1px solid rgba(233, 205, 155, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: var(--golden-beige);
+  backdrop-filter: blur(10px);
+}
+.faq-card h3 { margin: 0 0 0.75rem; font-family: "Cormorant Garamond", serif; font-size: 1.4rem; }
+.faq-card ul { margin: 0; padding-left: 1.25rem; }
+.faq-card li { margin: 0.25rem 0; }
+
+@media (max-width: 768px) {
+  .faq-section { grid-template-columns: 1fr; }
+}
+
 .contact-input,
 .contact-textarea {
   padding: 1rem;
@@ -1252,6 +1275,182 @@ body::after {
   .contact-form-row, .request-form-row { grid-template-columns: 1fr; }
   .contact-form-card, .request-card { padding: 2rem 1.5rem; }
   .contact-header h1, .on-request-header h1 { font-size: 2rem; }
+}
+
+/* ---------- LOGIN/REGISTER PAGES ---------- */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a0f0a 0%, #2d1b13 50%, #1a0f0a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-container {
+  background: rgba(122, 51, 38, 0.1);
+  border: 1px solid rgba(233, 205, 155, 0.3);
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  backdrop-filter: blur(10px);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: var(--golden-beige);
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.login-header p {
+  font-size: 1.1rem;
+  color: var(--golden-beige);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-form label {
+  font-weight: 600;
+  color: var(--golden-beige);
+  font-size: 14px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--golden-beige);
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid rgba(233, 205, 155, 0.3);
+  border-radius: 12px;
+  background: rgba(233, 205, 155, 0.1);
+  color: var(--golden-beige);
+  font-size: 16px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: var(--golden-beige);
+  background: rgba(233, 205, 155, 0.15);
+  box-shadow: 0 0 0 3px rgba(233, 205, 155, 0.2);
+}
+
+.login-form input::placeholder {
+  color: var(--golden-beige);
+  opacity: 0.6;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--golden-beige);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover {
+  opacity: 1;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--golden-beige) 0%, #d4af37 100%);
+  color: var(--dark-brown);
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d4af37 0%, var(--golden-beige) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.login-footer p {
+  color: var(--golden-beige);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.register-link {
+  color: var(--golden-beige);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.register-link:hover {
+  color: #d4af37;
+  text-decoration: underline;
+}
+
+/* Responsive adjustments for login/register */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  
+  .login-header h1 {
+    font-size: 2rem;
+  }
 }
 
 /* ---------- ADMIN DASHBOARD ---------- */
