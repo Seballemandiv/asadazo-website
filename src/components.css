@@ -1097,11 +1097,7 @@ body::after {
 }
 .password-toggle:hover { background: rgba(233, 205, 155, 0.1); }
 
-.auth-btn { width: 100%; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.2s ease; border: none; min-height: 48px; }
-.auth-btn.primary { background: var(--golden-beige); color: var(--espresso); }
-.auth-btn.primary:hover:not(:disabled) { background: #d4b87a; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
-.auth-btn.primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
-.auth-btn.primary:focus { outline: none; box-shadow: 0 0 0 3px rgba(233, 205, 155, 0.4); }
+/* Removed old auth-btn styles - now using login-btn */
 
 .auth-footer { margin-bottom: 2rem; }
 .auth-footer p { color: var(--golden-beige); margin: 0 0 1rem; font-size: 14px; }
@@ -1392,11 +1388,11 @@ body::after {
   opacity: 1;
 }
 
-.login-btn {
+.login-form .login-btn {
   width: 100%;
   padding: 1rem;
-  background: var(--dark-brown);
-  color: var(--golden-beige);
+  background: var(--dark-brown) !important;
+  color: var(--golden-beige) !important;
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -1406,14 +1402,14 @@ body::after {
   margin-top: 1rem;
 }
 
-.login-btn:hover:not(:disabled) {
-  background: rgba(122, 51, 38, 0.9);
+.login-form .login-btn:hover:not(:disabled) {
+  background: rgba(122, 51, 38, 0.9) !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(122, 51, 38, 0.3);
 }
 
-.login-btn:disabled {
-  background: var(--dark-brown);
+.login-form .login-btn:disabled {
+  background: var(--dark-brown) !important;
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
@@ -1423,13 +1419,18 @@ body::after {
 .login-form .form-group:last-child {
   text-align: center;
   margin-top: 1rem;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
 .login-form .form-group:last-child label {
-  justify-content: center;
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
   gap: 8px;
+  justify-content: center !important;
+  width: auto;
+  margin: 0 !important;
 }
 
 .login-footer {
