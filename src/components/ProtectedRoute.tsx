@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -8,18 +10,19 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
+  const navigate = useNavigate();
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated) {
+        navigate('/');
+      } else if (requireAdmin && !isAdmin) {
+        navigate('/');
+      }
+    }
+  }, [loading, isAuthenticated, isAdmin, requireAdmin, navigate]);
 
-  if (!isAuthenticated) {
-    return <div>Please log in to access this page.</div>;
-  }
-
-  if (requireAdmin && !isAdmin) {
-    return <div>You don't have permission to access this page.</div>;
-  }
+  if (loading || !isAuthenticated || (requireAdmin && !isAdmin)) return null;
 
   return <>{children}</>;
 };
