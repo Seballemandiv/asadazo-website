@@ -27,11 +27,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const response = await fetch('/api/me');
         if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
+          const payload = await response.json();
+          setUser(payload?.user ?? null);
+        } else {
+          setUser(null);
         }
       } catch (error) {
         console.error('Session check error:', error);
+        setUser(null);
       }
       setLoading(false);
     };
@@ -52,8 +55,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Get user data from /api/me
         const userResponse = await fetch('/api/me');
         if (userResponse.ok) {
-          const userData = await userResponse.json();
-          setUser(userData);
+          const payload = await userResponse.json();
+          setUser(payload?.user ?? null);
           return true;
         }
       }
@@ -83,8 +86,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Registration successful, user is automatically logged in
         const userResponse = await fetch('/api/me');
         if (userResponse.ok) {
-          const userData = await userResponse.json();
-          setUser(userData);
+          const payload = await userResponse.json();
+          setUser(payload?.user ?? null);
           return true;
         }
       }
