@@ -9,12 +9,21 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [remember, setRemember] = useState(false);
   // Demo credentials UI removed
   
   const { login } = useAuth();
   const navigate = useNavigate();
   
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, []);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Prefill from remembered email
+    const remembered = localStorage.getItem('asadazo_remember_email');
+    if (remembered) {
+      setEmail(remembered);
+      setRemember(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +33,11 @@ const LoginPage: React.FC = () => {
     try {
       const success = await login(email, password);
       if (success) {
+        if (remember) {
+          localStorage.setItem('asadazo_remember_email', email);
+        } else {
+          localStorage.removeItem('asadazo_remember_email');
+        }
         // Redirect to home page so users can navigate freely
         navigate('/');
       } else {
@@ -99,6 +113,12 @@ const LoginPage: React.FC = () => {
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
+            <div className="form-group" style={{ marginTop: '0.5rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="checkbox" checked={remember} onChange={(e)=>setRemember(e.target.checked)} />
+                Remember my email on this device
+              </label>
+            </div>
           </form>
 
           <div className="auth-footer">

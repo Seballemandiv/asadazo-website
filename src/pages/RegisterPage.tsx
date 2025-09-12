@@ -15,6 +15,7 @@ const RegisterPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -45,10 +46,11 @@ const RegisterPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const success = await register(formData.name, formData.email, formData.password, formData.phone);
-      if (success) {
-        // Redirect to home page so users can navigate freely
-        navigate('/');
+      const ok = await register(formData.name, formData.email, formData.password, formData.phone);
+      if (ok) {
+        // Show success modal (same style as other overlays), then send user to account
+        setSuccess(true);
+        setTimeout(() => navigate('/account'), 1500);
       } else {
         setError('Registration failed. Email might already be in use.');
       }
@@ -61,6 +63,19 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="login-page">
+      {success && (
+        <div className="cart-overlay">
+          <div className="cart-modal">
+            <div className="cart-header">
+              <h2>Account</h2>
+            </div>
+            <div className="cart-empty" style={{ textAlign: 'center' }}>
+              <h3>Account created</h3>
+              <p>You are now logged in. Redirecting to your account…</p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="login-container">
         <div className="login-header">
           <h1>Create Account</h1>
