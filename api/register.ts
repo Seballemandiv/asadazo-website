@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       phone: phone || '',
       passwordHash: hashed,
       createdAt: new Date().toISOString(),
-      role: 'customer',
+      role: email.toLowerCase() === 'admin@asadazo.nl' ? 'admin' : 'customer',
       verified: false
     };
 
