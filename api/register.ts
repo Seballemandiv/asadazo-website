@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const { name, email, password, phone } = body || {};
-    if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
+    if (!name || !email || !password || !phone) return res.status(400).json({ error: 'Missing required fields: name, email, password, and phone number' });
 
     const existing = await kv.get(kvUsersKey(email));
     if (existing) return res.status(409).json({ error: 'Email already registered' });
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
       name,
       email: email.toLowerCase(),
-      phone: phone || '',
+      phone: phone,
       passwordHash: hashed,
       createdAt: new Date().toISOString(),
       role: isAdminEmail(email) ? 'admin' : 'customer',

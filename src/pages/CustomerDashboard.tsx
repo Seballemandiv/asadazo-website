@@ -305,17 +305,17 @@ const CustomerDashboard = () => {
               <form className="profile-form" onSubmit={(e) => { e.preventDefault(); setToast({ message: 'Profile saved', type: 'success' }); }}>
                 <div className="form-group">
                   <label>Full Name</label>
-                  <input type="text" defaultValue="John Doe" />
+                  <input type="text" defaultValue={user?.name || ''} readOnly />
                 </div>
                 
                 <div className="form-group">
                   <label>Email</label>
-                  <input type="email" defaultValue="john.doe@example.com" />
+                  <input type="email" defaultValue={user?.email || ''} readOnly />
                 </div>
                 
                 <div className="form-group">
                   <label>Phone</label>
-                  <input type="tel" defaultValue="+31 6 12345678" />
+                  <input type="tel" defaultValue={user?.phone || ''} readOnly />
                 </div>
 
                 <div className="address-section">

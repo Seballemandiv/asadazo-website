@@ -40,6 +40,11 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
+    if (!formData.phone || formData.phone.trim().length < 6) {
+      setError('Phone number is required and must be at least 6 characters long');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
