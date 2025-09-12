@@ -67,28 +67,30 @@ const RegisterPage: React.FC = () => {
         <div className="cart-overlay">
           <div className="cart-modal">
             <div className="cart-header">
-              <h2>Account</h2>
+              <h2>Account Created</h2>
             </div>
             <div className="cart-empty" style={{ textAlign: 'center' }}>
-              <h3>Account created</h3>
-              <p>You are now logged in. Redirecting to your account…</p>
+              <h3>Welcome to Asadazo!</h3>
+              <p>Your account has been created successfully. You are now logged in.</p>
+              <p>Redirecting to your account...</p>
             </div>
           </div>
         </div>
       )}
-      <div className="login-container">
-        <div className="login-header">
-          <h1>Create Account</h1>
-          <p>Join Asadazo today</p>
-        </div>
-
-        {error && (
-          <div className="error-message">
-            {error}
+      <div className="cart-overlay">
+        <div className="cart-modal">
+          <div className="cart-header">
+            <h2>Create Account</h2>
+            <p>Join Asadazo today</p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="login-form">
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="checkout-form">
           <div className="form-group">
             <label htmlFor="name">Full Name</label>
             <div className="input-wrapper">
@@ -183,22 +185,23 @@ const RegisterPage: React.FC = () => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="login-btn"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        </form>
+            <button 
+              type="submit" 
+              className="payment-btn"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
+          </form>
 
-        <div className="login-footer">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login" className="register-link">
-              Sign in here
-            </Link>
-          </p>
+          <div className="login-footer" style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <p>
+              Already have an account?{' '}
+              <Link to="/login" className="register-link">
+                Sign in here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

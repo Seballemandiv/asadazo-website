@@ -51,22 +51,21 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
-            <h1>Sign In</h1>
+    <div className="login-page">
+      <div className="cart-overlay">
+        <div className="cart-modal">
+          <div className="cart-header">
+            <h2>Sign In</h2>
             <p>Welcome back to Asadazo</p>
           </div>
 
           {error && (
-            <div className="auth-error">
-              <span className="error-icon">⚠️</span>
+            <div className="error-message">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="auth-form">
+          <form onSubmit={handleSubmit} className="checkout-form">
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <div className="input-wrapper">
@@ -108,7 +107,7 @@ const LoginPage: React.FC = () => {
 
             <button 
               type="submit" 
-              className="auth-btn primary"
+              className="payment-btn"
               disabled={isLoading}
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
@@ -121,19 +120,17 @@ const LoginPage: React.FC = () => {
             </div>
           </form>
 
-          <div className="auth-footer">
+          <div className="login-footer" style={{ textAlign: 'center', marginTop: '1rem' }}>
             <p>
               Don't have an account?{' '}
-              <Link to="/register" className="auth-link">
+              <Link to="/register" className="register-link">
                 Sign up here
               </Link>
             </p>
-            <Link to="/forgot-password" className="auth-link">
+            <Link to="/forgot-password" className="register-link">
               Forgot password?
             </Link>
           </div>
-
-          {/* Demo credentials removed for production */}
         </div>
       </div>
     </div>
