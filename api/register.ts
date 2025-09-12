@@ -20,6 +20,7 @@ export default async function handler(req, res) {
     if (existing) return res.status(409).json({ error: 'Email already registered' });
 
     const hashed = await bcrypt.hash(password, 10);
+    const isAdminEmail = (e) => e.toLowerCase().startsWith('admin') && e.toLowerCase().endsWith('@asadazo.nl');
     const user = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
       name,
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
       phone: phone || '',
       passwordHash: hashed,
       createdAt: new Date().toISOString(),
-      role: email.toLowerCase() === 'admin@asadazo.nl' ? 'admin' : 'customer',
+      role: isAdminEmail(email) ? 'admin' : 'customer',
       verified: false
     };
 
