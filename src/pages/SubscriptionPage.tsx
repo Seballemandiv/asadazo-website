@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, Calendar, Package, MapPin, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { SubscriptionProduct, SubscriptionSuggestion, Address, Product } from '../types';
+import type { SubscriptionProduct, Address, Product } from '../types';
 import { products } from '../data/products';
 import Toast from '../components/Toast';
 
@@ -31,7 +31,6 @@ const SubscriptionPage = () => {
     notes: ''
   });
 
-  const [suggestions, setSuggestions] = useState<SubscriptionSuggestion[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
 
   const steps = [
@@ -42,10 +41,9 @@ const SubscriptionPage = () => {
     { number: 5, title: 'Review & Confirm', icon: <Check size={20} /> }
   ];
 
-  // Load products and suggestions when type changes
+  // Load products when type changes
   useEffect(() => {
     if (formData.type) {
-      loadSuggestions();
       loadProducts();
     }
   }, [formData.type]);
@@ -58,17 +56,6 @@ const SubscriptionPage = () => {
     setAvailableProducts(meatProducts);
   };
 
-  const loadSuggestions = async () => {
-    try {
-      const response = await fetch(`/api/subscription-suggestions?type=${formData.type}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSuggestions(data.suggestions);
-      }
-    } catch (error) {
-      console.error('Error loading suggestions:', error);
-    }
-  };
 
   const handleNext = () => {
     if (currentStep < 5) {
