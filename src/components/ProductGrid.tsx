@@ -65,6 +65,15 @@ const ProductGrid = () => {
     return matchesSearch && matchesCategory;
   }).slice().sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 
+  // Debug logging
+  console.log('Selected category:', selectedCategory);
+  console.log('Total products:', products.length);
+  console.log('Filtered products:', filteredProducts.length);
+  console.log('Products by category:', products.reduce((acc, p) => {
+    acc[p.category] = (acc[p.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>));
+
   return (
     <section id="products" className="products-section">
       <div className="products-container">

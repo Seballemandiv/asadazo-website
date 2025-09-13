@@ -25,7 +25,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <div className="product-card">
-      <div className="product-image.pngimage">
+      <div className="product-image">
         <img
           src={product.image || '/images/Products/Asado.jpg'}
           alt={product.name}
