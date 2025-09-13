@@ -1636,9 +1636,9 @@ body::after {
 .steps-indicator::before {
   content: '';
   position: absolute;
-  top: 20px;
-  left: 40px;
-  right: 40px;
+  top: 50px;
+  left: 50px;
+  right: 50px;
   height: 2px;
   background: rgba(233, 205, 155, 0.3);
   z-index: 1;
@@ -1648,26 +1648,32 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 2;
   background: rgba(44, 24, 16, 0.8);
-  padding: 1rem;
+  padding: 0.5rem;
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
+  min-height: 100px;
 }
 
 .step-icon {
   color: var(--golden-beige);
   opacity: 0.6;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+  flex-shrink: 0;
 }
 
 .step-title {
   color: var(--golden-beige);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   text-align: center;
   opacity: 0.6;
+  line-height: 1.1;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .step.active .step-icon,
@@ -1740,14 +1746,6 @@ body::after {
   font-size: 0.9rem;
 }
 
-.option-card .weight {
-  background: rgba(122, 51, 38, 0.3);
-  color: var(--golden-beige);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
 
 .weight-input {
   max-width: 300px;

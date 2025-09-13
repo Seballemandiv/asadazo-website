@@ -399,8 +399,8 @@ const CustomerDashboard = () => {
               {subscriptions.length === 0 ? (
                 <div className="empty-state">
                   <Calendar size={48} />
-                  <h3>No subscriptions yet</h3>
-                  <p>Create your first subscription to get regular deliveries</p>
+                         <h3>Create your subscriptions</h3>
+                         <p>Get regular deliveries of premium Argentinian cuts</p>
                   <button 
                     className="btn-primary"
                     onClick={() => navigate('/subscriptions')}

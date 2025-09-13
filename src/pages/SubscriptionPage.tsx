@@ -208,7 +208,7 @@ const SubscriptionPage = () => {
       case 1:
         return (
           <div className="step-content">
-            <h3>Choose Your Subscription Frequency</h3>
+            <h3>Choose your subscription frequency</h3>
             <div className="option-grid">
               <button
                 className={`option-card ${formData.type === 'weekly' ? 'selected' : ''}`}
@@ -217,7 +217,6 @@ const SubscriptionPage = () => {
                 <Calendar size={32} />
                 <h4>Weekly</h4>
                 <p>Fresh cuts every week</p>
-                <span className="weight">4kg per delivery</span>
               </button>
               <button
                 className={`option-card ${formData.type === 'monthly' ? 'selected' : ''}`}
@@ -226,7 +225,6 @@ const SubscriptionPage = () => {
                 <Calendar size={32} />
                 <h4>Monthly</h4>
                 <p>Premium selection monthly</p>
-                <span className="weight">12kg per delivery</span>
               </button>
               <button
                 className={`option-card ${formData.type === 'custom' ? 'selected' : ''}`}
@@ -234,8 +232,7 @@ const SubscriptionPage = () => {
               >
                 <Package size={32} />
                 <h4>Custom</h4>
-                <p>Choose your own weight</p>
-                <span className="weight">Flexible amount</span>
+                <p>Choose your preferred frequency</p>
               </button>
             </div>
           </div>
