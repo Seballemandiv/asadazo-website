@@ -1,0 +1,534 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Check, Calendar, Package, MapPin, ShoppingCart } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import type { Subscription, SubscriptionProduct, SubscriptionSuggestion, Address } from '../types';
+import Toast from '../components/Toast';
+
+const SubscriptionPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // Form data
+  const [formData, setFormData] = useState({
+    type: '' as 'weekly' | 'monthly' | 'custom',
+    frequency: '' as 'weekly' | 'monthly',
+    totalWeight: 0,
+    deliveryMethod: '' as 'pickup' | 'delivery',
+    deliveryAddress: {
+      street: '',
+      number: '',
+      city: '',
+      region: '',
+      postalCode: '',
+      country: 'Netherlands'
+    } as Address,
+    selectedProducts: [] as SubscriptionProduct[],
+    notes: ''
+  });
+
+  const [suggestions, setSuggestions] = useState<SubscriptionSuggestion[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+
+  const steps = [
+    { number: 1, title: 'Choose Frequency', icon: <Calendar size={20} /> },
+    { number: 2, title: 'Select Weight', icon: <Package size={20} /> },
+    { number: 3, title: 'Delivery Method', icon: <MapPin size={20} /> },
+    { number: 4, title: 'Choose Cuts', icon: <ShoppingCart size={20} /> },
+    { number: 5, title: 'Review & Confirm', icon: <Check size={20} /> }
+  ];
+
+  // Load product suggestions when type changes
+  useEffect(() => {
+    if (formData.type) {
+      loadSuggestions();
+    }
+  }, [formData.type]);
+
+  const loadSuggestions = async () => {
+    try {
+      const response = await fetch(`/api/subscription-suggestions?type=${formData.type}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data.suggestions);
+      }
+    } catch (error) {
+      console.error('Error loading suggestions:', error);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentStep < 5) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleTypeSelect = (type: 'weekly' | 'monthly' | 'custom') => {
+    const weight = type === 'weekly' ? 4 : type === 'monthly' ? 12 : 0;
+    setFormData(prev => ({
+      ...prev,
+      type,
+      totalWeight: weight,
+      frequency: type === 'custom' ? 'monthly' : type
+    }));
+  };
+
+  const handleWeightChange = (weight: number) => {
+    setFormData(prev => ({
+      ...prev,
+      totalWeight: weight
+    }));
+  };
+
+  const handleDeliveryMethod = (method: 'pickup' | 'delivery') => {
+    setFormData(prev => ({
+      ...prev,
+      deliveryMethod: method
+    }));
+  };
+
+  const handleAddressChange = (field: keyof Address, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      deliveryAddress: {
+        ...prev.deliveryAddress,
+        [field]: value
+      }
+    }));
+  };
+
+  const handleProductSelect = (product: SubscriptionSuggestion, weight: number) => {
+    const existingIndex = formData.selectedProducts.findIndex(p => p.productId === product.productId);
+    
+    if (existingIndex >= 0) {
+      // Update existing product
+      const updated = [...formData.selectedProducts];
+      updated[existingIndex] = {
+        ...updated[existingIndex],
+        weight: weight
+      };
+      setFormData(prev => ({
+        ...prev,
+        selectedProducts: updated
+      }));
+    } else {
+      // Add new product
+      setFormData(prev => ({
+        ...prev,
+        selectedProducts: [
+          ...prev.selectedProducts,
+          {
+            productId: product.productId,
+            productName: product.productName,
+            weight: weight,
+            price: product.price,
+            isSuggestion: true
+          }
+        ]
+      }));
+    }
+  };
+
+  const removeProduct = (productId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedProducts: prev.selectedProducts.filter(p => p.productId !== productId)
+    }));
+  };
+
+  const getTotalWeight = () => {
+    return formData.selectedProducts.reduce((sum, product) => sum + product.weight, 0);
+  };
+
+  const getTotalPrice = () => {
+    return formData.selectedProducts.reduce((sum, product) => sum + (product.price * product.weight), 0);
+  };
+
+  const isStepValid = () => {
+    switch (currentStep) {
+      case 1: return formData.type !== '';
+      case 2: return formData.totalWeight > 0;
+      case 3: return formData.deliveryMethod !== '' && (formData.deliveryMethod === 'pickup' || 
+        (formData.deliveryAddress.street && formData.deliveryAddress.city && formData.deliveryAddress.postalCode));
+      case 4: return formData.selectedProducts.length > 0 && Math.abs(getTotalWeight() - formData.totalWeight) < 0.1;
+      case 5: return true;
+      default: return false;
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      setToast({ message: 'Please log in to create a subscription', type: 'error' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: formData.type,
+          selectedProducts: formData.selectedProducts,
+          frequency: formData.frequency,
+          deliveryAddress: formData.deliveryAddress,
+          pickupOption: formData.deliveryMethod === 'pickup',
+          notes: formData.notes
+        })
+      });
+
+      if (response.ok) {
+        setToast({ message: 'Subscription created successfully! It will be reviewed shortly.', type: 'success' });
+        setTimeout(() => {
+          navigate('/account');
+        }, 2000);
+      } else {
+        const error = await response.json();
+        setToast({ message: error.error || 'Failed to create subscription', type: 'error' });
+      }
+    } catch (error) {
+      setToast({ message: 'An error occurred. Please try again.', type: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="step-content">
+            <h3>Choose Your Subscription Frequency</h3>
+            <div className="option-grid">
+              <button
+                className={`option-card ${formData.type === 'weekly' ? 'selected' : ''}`}
+                onClick={() => handleTypeSelect('weekly')}
+              >
+                <Calendar size={32} />
+                <h4>Weekly</h4>
+                <p>Fresh cuts every week</p>
+                <span className="weight">4kg per delivery</span>
+              </button>
+              <button
+                className={`option-card ${formData.type === 'monthly' ? 'selected' : ''}`}
+                onClick={() => handleTypeSelect('monthly')}
+              >
+                <Calendar size={32} />
+                <h4>Monthly</h4>
+                <p>Premium selection monthly</p>
+                <span className="weight">12kg per delivery</span>
+              </button>
+              <button
+                className={`option-card ${formData.type === 'custom' ? 'selected' : ''}`}
+                onClick={() => handleTypeSelect('custom')}
+              >
+                <Package size={32} />
+                <h4>Custom</h4>
+                <p>Choose your own weight</p>
+                <span className="weight">Flexible amount</span>
+              </button>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="step-content">
+            <h3>Select Total Weight</h3>
+            {formData.type === 'custom' ? (
+              <div className="weight-input">
+                <label>Total Weight (kg)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  step="0.5"
+                  value={formData.totalWeight || ''}
+                  onChange={(e) => handleWeightChange(parseFloat(e.target.value) || 0)}
+                  placeholder="Enter weight in kg"
+                />
+              </div>
+            ) : (
+              <div className="weight-display">
+                <div className="weight-card">
+                  <Package size={48} />
+                  <h4>{formData.totalWeight}kg</h4>
+                  <p>{formData.type === 'weekly' ? 'Weekly delivery' : 'Monthly delivery'}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="step-content">
+            <h3>Choose Delivery Method</h3>
+            <div className="delivery-options">
+              <button
+                className={`delivery-option ${formData.deliveryMethod === 'pickup' ? 'selected' : ''}`}
+                onClick={() => handleDeliveryMethod('pickup')}
+              >
+                <MapPin size={32} />
+                <h4>Pickup</h4>
+                <p>Collect from our location</p>
+                <span className="price">Free</span>
+              </button>
+              <button
+                className={`delivery-option ${formData.deliveryMethod === 'delivery' ? 'selected' : ''}`}
+                onClick={() => handleDeliveryMethod('delivery')}
+              >
+                <MapPin size={32} />
+                <h4>Delivery</h4>
+                <p>We deliver to your address</p>
+                <span className="price">€20</span>
+              </button>
+            </div>
+
+            {formData.deliveryMethod === 'delivery' && (
+              <div className="address-form">
+                <h4>Delivery Address</h4>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Street</label>
+                    <input
+                      type="text"
+                      value={formData.deliveryAddress.street}
+                      onChange={(e) => handleAddressChange('street', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Number</label>
+                    <input
+                      type="text"
+                      value={formData.deliveryAddress.number}
+                      onChange={(e) => handleAddressChange('number', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>City</label>
+                    <input
+                      type="text"
+                      value={formData.deliveryAddress.city}
+                      onChange={(e) => handleAddressChange('city', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Postal Code</label>
+                    <input
+                      type="text"
+                      value={formData.deliveryAddress.postalCode}
+                      onChange={(e) => handleAddressChange('postalCode', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Country</label>
+                    <select
+                      value={formData.deliveryAddress.country}
+                      onChange={(e) => handleAddressChange('country', e.target.value)}
+                    >
+                      <option value="Netherlands">Netherlands</option>
+                      <option value="Belgium">Belgium</option>
+                      <option value="Germany">Germany</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="step-content">
+            <h3>Choose Your Cuts</h3>
+            <div className="weight-summary">
+              <p>Target: {formData.totalWeight}kg | Selected: {getTotalWeight().toFixed(1)}kg</p>
+            </div>
+            
+            <div className="suggestions-section">
+              <h4>Our Suggestions</h4>
+              <div className="suggestions-grid">
+                {suggestions.map((suggestion) => (
+                  <div key={suggestion.productId} className="suggestion-card">
+                    <h5>{suggestion.productName}</h5>
+                    <p>{suggestion.reason}</p>
+                    <div className="suggestion-actions">
+                      <input
+                        type="number"
+                        min="0.5"
+                        max={formData.totalWeight}
+                        step="0.5"
+                        placeholder="Weight (kg)"
+                        onChange={(e) => handleProductSelect(suggestion, parseFloat(e.target.value) || 0)}
+                      />
+                      <span className="price">€{suggestion.price}/kg</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {formData.selectedProducts.length > 0 && (
+              <div className="selected-products">
+                <h4>Selected Products</h4>
+                <div className="selected-list">
+                  {formData.selectedProducts.map((product, index) => (
+                    <div key={index} className="selected-item">
+                      <span>{product.productName} - {product.weight}kg</span>
+                      <button onClick={() => removeProduct(product.productId)}>Remove</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 5:
+        return (
+          <div className="step-content">
+            <h3>Review Your Subscription</h3>
+            <div className="review-summary">
+              <div className="summary-card">
+                <h4>Subscription Details</h4>
+                <div className="summary-item">
+                  <span>Type:</span>
+                  <span>{formData.type === 'weekly' ? 'Weekly' : formData.type === 'monthly' ? 'Monthly' : 'Custom'} Box</span>
+                </div>
+                <div className="summary-item">
+                  <span>Weight:</span>
+                  <span>{formData.totalWeight}kg</span>
+                </div>
+                <div className="summary-item">
+                  <span>Frequency:</span>
+                  <span>{formData.frequency}</span>
+                </div>
+                <div className="summary-item">
+                  <span>Delivery:</span>
+                  <span>{formData.deliveryMethod === 'pickup' ? 'Pickup' : 'Delivery'}</span>
+                </div>
+                {formData.deliveryMethod === 'delivery' && (
+                  <div className="summary-item">
+                    <span>Address:</span>
+                    <span>{formData.deliveryAddress.street} {formData.deliveryAddress.number}, {formData.deliveryAddress.city}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="summary-card">
+                <h4>Selected Cuts</h4>
+                {formData.selectedProducts.map((product, index) => (
+                  <div key={index} className="product-summary">
+                    <span>{product.productName}</span>
+                    <span>{product.weight}kg × €{product.price} = €{(product.weight * product.price).toFixed(2)}</span>
+                  </div>
+                ))}
+                <div className="total-summary">
+                  <strong>Total: €{getTotalPrice().toFixed(2)}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="notes-section">
+              <label>Additional Notes (Optional)</label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="Any special requests or notes..."
+                rows={3}
+              />
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="subscription-page">
+      <div className="subscription-container">
+        <div className="subscription-header">
+          <h1>Create Your Subscription</h1>
+          <p>Get regular deliveries of premium Argentinian cuts</p>
+        </div>
+
+        <div className="steps-indicator">
+          {steps.map((step) => (
+            <div
+              key={step.number}
+              className={`step ${currentStep >= step.number ? 'active' : ''} ${currentStep === step.number ? 'current' : ''}`}
+            >
+              <div className="step-icon">{step.icon}</div>
+              <span className="step-title">{step.title}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="subscription-form">
+          {renderStepContent()}
+
+          <div className="form-actions">
+            {currentStep > 1 && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handlePrevious}
+              >
+                <ChevronLeft size={16} />
+                Previous
+              </button>
+            )}
+            
+            {currentStep < 5 ? (
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleNext}
+                disabled={!isStepValid()}
+              >
+                Next
+                <ChevronRight size={16} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleSubmit}
+                disabled={isLoading || !isStepValid()}
+              >
+                {isLoading ? 'Creating...' : 'Create Subscription'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </div>
+  );
+};
+
+export default SubscriptionPage;

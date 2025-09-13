@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import SubscriptionPage from './pages/SubscriptionPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import MediaLinks from './components/MediaLinks';
 import './components.css';
@@ -66,6 +67,16 @@ function App() {
                   <RegisterPage />
                 </AppShell>
               } />
+              <Route
+                path="/subscriptions"
+                element={
+                  <ProtectedRoute>
+                    <AppShell>
+                      <SubscriptionPage />
+                    </AppShell>
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/account"
                 element={
