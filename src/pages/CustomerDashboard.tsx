@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, CreditCard, User, Plus, Edit, Trash2, MapPin, LogOut } from 'lucide-react';
+import { Package, CreditCard, User, Plus, Edit, Trash2, MapPin, LogOut, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { Order, PaymentMethod } from '../types';
+import type { Order, PaymentMethod, Subscription } from '../types';
 import Toast from '../components/Toast';
 
 // Orders are stored locally for now
@@ -54,8 +54,9 @@ type PaymentFormData = {
   idealBank: string;
 };
 
-const tabs: Array<{ key: 'orders' | 'payment' | 'profile' | 'logout'; label: string; icon: React.ReactNode }> = [
+const tabs: Array<{ key: 'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'; label: string; icon: React.ReactNode }> = [
   { key: 'orders', label: 'Orders', icon: <Package size={16} /> },
+  { key: 'subscriptions', label: 'Subscriptions', icon: <Calendar size={16} /> },
   { key: 'payment', label: 'Payment Methods', icon: <CreditCard size={16} /> },
   { key: 'profile', label: 'Profile', icon: <User size={16} /> },
   { key: 'logout', label: 'Logout', icon: <LogOut size={16} /> },
@@ -65,7 +66,8 @@ const CustomerDashboard = () => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'payment' | 'profile' | 'logout'>('orders');
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'>('orders');
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [newPaymentMethod, setNewPaymentMethod] = useState<PaymentFormData>({
     type: 'card',
@@ -134,13 +136,13 @@ const CustomerDashboard = () => {
 
   useEffect(() => {
     const load = async () => {
+      // Load orders
       try {
         const res = await fetch('/api/orders');
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.orders)) {
             setOrders(data.orders);
-            return;
           }
         }
       } catch {}
@@ -148,6 +150,17 @@ const CustomerDashboard = () => {
       try {
         const saved = localStorage.getItem(ORDERS_STORAGE_KEY);
         if (saved) setOrders(JSON.parse(saved));
+      } catch {}
+
+      // Load subscriptions
+      try {
+        const subRes = await fetch('/api/subscriptions');
+        if (subRes.ok) {
+          const subData = await subRes.json();
+          if (Array.isArray(subData.subscriptions)) {
+            setSubscriptions(subData.subscriptions);
+          }
+        }
       } catch {}
     };
     load();
@@ -367,6 +380,100 @@ const CustomerDashboard = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {activeTab === 'subscriptions' && (
+            <div id="panel-subscriptions" role="tabpanel" aria-labelledby="tab-subscriptions" className="subscriptions-section">
+              <div className="section-header">
+                <h2>My Subscriptions</h2>
+                <button 
+                  className="add-button"
+                  onClick={() => navigate('/subscriptions')}
+                >
+                  <Plus size={16} />
+                  New Subscription
+                </button>
+              </div>
+              
+              {subscriptions.length === 0 ? (
+                <div className="empty-state">
+                  <Calendar size={48} />
+                  <h3>No subscriptions yet</h3>
+                  <p>Create your first subscription to get regular deliveries</p>
+                  <button 
+                    className="btn-primary"
+                    onClick={() => navigate('/subscriptions')}
+                  >
+                    Create Subscription
+                  </button>
+                </div>
+              ) : (
+                <div className="subscriptions-list">
+                  {subscriptions.map((subscription) => (
+                    <div key={subscription.id} className="subscription-card">
+                      <div className="subscription-header">
+                        <div className="subscription-info">
+                          <h3>
+                            {subscription.type === 'weekly' ? 'Weekly' : 
+                             subscription.type === 'monthly' ? 'Monthly' : 'Custom'} Box
+                          </h3>
+                          <p className="subscription-weight">{subscription.totalWeight}kg</p>
+                        </div>
+                        <div className={`subscription-status status-${subscription.status}`}>
+                          {subscription.status === 'active' ? 'Active' :
+                           subscription.status === 'pending review' ? 'Under Review' :
+                           subscription.status === 'confirmed' ? 'Confirmed' :
+                           subscription.status === 'cancelled' ? 'Cancelled' : 'Paused'}
+                        </div>
+                      </div>
+                      
+                      <div className="subscription-details">
+                        <div className="subscription-products">
+                          <h4>Selected Cuts:</h4>
+                          <ul>
+                            {subscription.selectedProducts.map((product, index) => (
+                              <li key={index}>
+                                {product.productName} - {product.weight}kg
+                                {product.isSuggestion && <span className="suggestion-badge">Suggested</span>}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div className="subscription-meta">
+                          <p><strong>Frequency:</strong> {subscription.frequency}</p>
+                          <p><strong>Next Delivery:</strong> {new Date(subscription.nextDelivery).toLocaleDateString()}</p>
+                          <p><strong>Delivery:</strong> {subscription.pickupOption ? 'Pickup' : 'Delivery'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="subscription-actions">
+                        {subscription.status === 'active' && (
+                          <button 
+                            className="btn-outline"
+                            onClick={() => {
+                              // TODO: Implement pause functionality
+                              setToast({ message: 'Subscription paused', type: 'success' });
+                            }}
+                          >
+                            Pause
+                          </button>
+                        )}
+                        <button 
+                          className="btn-cancel"
+                          onClick={() => {
+                            // TODO: Implement cancel functionality
+                            setToast({ message: 'Subscription cancelled', type: 'success' });
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
