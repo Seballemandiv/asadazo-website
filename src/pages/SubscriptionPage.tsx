@@ -102,7 +102,7 @@ const SubscriptionPage = () => {
     }));
   };
 
-  const handleProductSelect = (product: SubscriptionSuggestion, weight: number) => {
+  const handleProductSelect = (product: { productId: string; productName: string; price: number }, weight: number) => {
     const existingIndex = formData.selectedProducts.findIndex(p => p.productId === product.productId);
     
     if (existingIndex >= 0) {
