@@ -15,8 +15,8 @@ const Footer = () => {
           <h4>Shop</h4>
           <ul>
             <li><a href="#products">Signature Cuts</a></li>
-            <li><a href="#gift-boxes">Boxes</a></li>
             <li><a href="#subscriptions">Subscriptions</a></li>
+            <li><a href="#gift-boxes">Boxes</a></li>
           </ul>
         </div>
 
@@ -24,9 +24,9 @@ const Footer = () => {
         <div className="footer-column">
           <h4 className="cursive">Meat us</h4>
           <ul>
-            <li><a href="#corporate">Corporative events</a></li>
+            <li><a href="#corporate">Corporate events</a></li>
             <li><a href="#social">Social events</a></li>
-            <li><a href="#home">Home events</a></li>
+            <li><a href="#home">Private dinner</a></li>
           </ul>
         </div>
 
@@ -34,10 +34,10 @@ const Footer = () => {
         <div className="footer-column">
           <h4>Contact</h4>
           <ul>
-            <li><a href="mailto:info@asadazo.nl">info@asadazo.nl</a></li>
-            <li><a href="tel:+31627830723">+31 (0) 6 2783 0723</a></li>
-            <li>Panamalaan 125, 1019 AS.</li>
             <li>Amsterdam, The Netherlands</li>
+            <li>Panamalaan 125, 1019 AS.</li>
+            <li><a href="tel:+31627830723">+31 (0) 6 2783 0723</a></li>
+            <li><a href="mailto:info@asadazo.nl">info@asadazo.nl</a></li>
           </ul>
         </div>
       </div>
