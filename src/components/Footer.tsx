@@ -22,7 +22,7 @@ const Footer = () => {
 
         {/* Visit Column */}
         <div className="footer-column">
-          <h4><span className="cursive">Meat</span> us</h4>
+          <h4 className="cursive">Meat us</h4>
           <ul>
             <li><a href="#corporate">Corporative events</a></li>
             <li><a href="#social">Social events</a></li>
