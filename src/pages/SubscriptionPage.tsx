@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, Calendar, Package, MapPin, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { Subscription, SubscriptionProduct, SubscriptionSuggestion, Address } from '../types';
+import type { SubscriptionProduct, SubscriptionSuggestion, Address } from '../types';
 import Toast from '../components/Toast';
 
 const SubscriptionPage = () => {
@@ -14,10 +14,10 @@ const SubscriptionPage = () => {
 
   // Form data
   const [formData, setFormData] = useState({
-    type: '' as 'weekly' | 'monthly' | 'custom',
-    frequency: '' as 'weekly' | 'monthly',
+    type: '' as '' | 'weekly' | 'monthly' | 'custom',
+    frequency: '' as '' | 'weekly' | 'monthly',
     totalWeight: 0,
-    deliveryMethod: '' as 'pickup' | 'delivery',
+    deliveryMethod: '' as '' | 'pickup' | 'delivery',
     deliveryAddress: {
       street: '',
       number: '',
@@ -31,7 +31,6 @@ const SubscriptionPage = () => {
   });
 
   const [suggestions, setSuggestions] = useState<SubscriptionSuggestion[]>([]);
-  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
 
   const steps = [
     { number: 1, title: 'Choose Frequency', icon: <Calendar size={20} /> },
