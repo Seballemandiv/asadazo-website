@@ -953,11 +953,11 @@ body::after {
 }
 
 .footer-column h4 { 
-  font-weight: 700; 
+  font-weight: bold; 
   margin-bottom: 0.8rem; 
-  font-size: 1.1rem; 
-  font-family: 'Georgia', serif; 
-  color: #8B4513; 
+  font-size: 1.2rem; 
+  color: var(--golden-beige); 
+  opacity: 0.9; 
 }
 .footer-column ul { list-style: none; padding: 0; margin: 0; }
 .footer-column li { margin-bottom: 0.4rem; }
