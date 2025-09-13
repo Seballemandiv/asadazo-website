@@ -15,8 +15,8 @@ const SubscriptionPage = () => {
 
   // Form data
   const [formData, setFormData] = useState({
-    type: '' as '' | 'weekly' | 'monthly' | 'custom',
-    frequency: '' as '' | 'weekly' | 'monthly',
+    type: '' as '' | 'weekly' | 'biweekly' | 'triweekly' | 'monthly',
+    frequency: '' as '' | 'weekly' | 'biweekly' | 'triweekly' | 'monthly',
     totalWeight: 0,
     deliveryMethod: '' as '' | 'pickup' | 'delivery',
     deliveryAddress: {
@@ -69,12 +69,12 @@ const SubscriptionPage = () => {
     }
   };
 
-  const handleTypeSelect = (type: 'weekly' | 'monthly' | 'custom') => {
+  const handleTypeSelect = (type: 'weekly' | 'biweekly' | 'triweekly' | 'monthly') => {
     setFormData(prev => ({
       ...prev,
       type,
       totalWeight: 0, // Let user input their own weight
-      frequency: type === 'custom' ? 'monthly' : type
+      frequency: type
     }));
   };
 
@@ -216,20 +216,28 @@ const SubscriptionPage = () => {
                 <p>Fresh cuts every week</p>
               </button>
               <button
+                className={`option-card ${formData.type === 'biweekly' ? 'selected' : ''}`}
+                onClick={() => handleTypeSelect('biweekly')}
+              >
+                <Calendar size={32} />
+                <h4>Every 2 weeks</h4>
+                <p>Fresh cuts every two weeks</p>
+              </button>
+              <button
+                className={`option-card ${formData.type === 'triweekly' ? 'selected' : ''}`}
+                onClick={() => handleTypeSelect('triweekly')}
+              >
+                <Calendar size={32} />
+                <h4>Every 3 weeks</h4>
+                <p>Fresh cuts every three weeks</p>
+              </button>
+              <button
                 className={`option-card ${formData.type === 'monthly' ? 'selected' : ''}`}
                 onClick={() => handleTypeSelect('monthly')}
               >
                 <Calendar size={32} />
                 <h4>Monthly</h4>
                 <p>Premium selection monthly</p>
-              </button>
-              <button
-                className={`option-card ${formData.type === 'custom' ? 'selected' : ''}`}
-                onClick={() => handleTypeSelect('custom')}
-              >
-                <Package size={32} />
-                <h4>Custom</h4>
-                <p>Choose your preferred frequency</p>
               </button>
             </div>
           </div>
@@ -241,17 +249,18 @@ const SubscriptionPage = () => {
             <h3>Select Total Weight</h3>
             <div className="weight-input">
               <label>Total Weight (kg)</label>
-              <input
-                type="number"
-                min="1"
-                max="50"
-                step="0.5"
-                value={formData.totalWeight || ''}
-                onChange={(e) => handleWeightChange(parseFloat(e.target.value) || 0)}
-                placeholder="Enter weight in kg"
-              />
+                <input
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  value={formData.totalWeight || ''}
+                  onChange={(e) => handleWeightChange(parseFloat(e.target.value) || 0)}
+                  placeholder="Enter weight in kg"
+                />
               <p className="weight-hint">
                 {formData.type === 'weekly' ? 'Recommended: 2-6kg for weekly delivery' : 
+                 formData.type === 'biweekly' ? 'Recommended: 4-8kg for bi-weekly delivery' :
+                 formData.type === 'triweekly' ? 'Recommended: 6-12kg for tri-weekly delivery' :
                  formData.type === 'monthly' ? 'Recommended: 8-15kg for monthly delivery' : 
                  'Choose any amount that works for you'}
               </p>
@@ -270,7 +279,7 @@ const SubscriptionPage = () => {
               >
                 <MapPin size={32} />
                 <h4>Pickup</h4>
-                <p>Collect from our location</p>
+                <p>Collect from our location in Amsterdam</p>
                 <span className="price">Free</span>
               </button>
               <button
@@ -279,10 +288,31 @@ const SubscriptionPage = () => {
               >
                 <MapPin size={32} />
                 <h4>Delivery</h4>
-                <p>We deliver to your address</p>
-                <span className="price">€20</span>
+                <p>We deliver anywhere in the Netherlands</p>
+                <span className="price">From €10</span>
               </button>
             </div>
+
+            {formData.deliveryMethod === 'delivery' && (
+              <div className="delivery-guidelines">
+                <h4>Delivery Guidelines</h4>
+                <div className="guidelines-content">
+                  <div className="guideline-section">
+                    <h5>Amsterdam Delivery:</h5>
+                    <ul>
+                      <li><strong>Inside the ring:</strong> €10 (Minimum order 1kg. Orders €80+ = free delivery)</li>
+                      <li><strong>Outside the ring:</strong> €20 (Minimum order €80. Orders €160+ = free delivery)</li>
+                    </ul>
+                  </div>
+                  <div className="guideline-section">
+                    <h5>Outside Amsterdam:</h5>
+                    <ul>
+                      <li><strong>Rate:</strong> €1 per kilometer from Amsterdam</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {formData.deliveryMethod === 'delivery' && (
               <div className="address-form">
@@ -330,8 +360,6 @@ const SubscriptionPage = () => {
                       onChange={(e) => handleAddressChange('country', e.target.value)}
                     >
                       <option value="Netherlands">Netherlands</option>
-                      <option value="Belgium">Belgium</option>
-                      <option value="Germany">Germany</option>
                     </select>
                   </div>
                 </div>

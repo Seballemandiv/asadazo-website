@@ -1592,7 +1592,10 @@ body::after {
 /* ---------- SUBSCRIPTION PAGE ---------- */
 .subscription-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+  background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%), url('/images/Products/Asado.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 2rem 1rem;
 }
 
@@ -1858,6 +1861,48 @@ body::after {
   font-weight: 600;
 }
 
+.delivery-guidelines {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: rgba(233, 205, 155, 0.05);
+  border: 1px solid rgba(233, 205, 155, 0.2);
+  border-radius: 12px;
+}
+
+.delivery-guidelines h4 {
+  color: var(--golden-beige);
+  margin: 0 0 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.guidelines-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.guideline-section h5 {
+  color: var(--golden-beige);
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.guideline-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.guideline-section li {
+  color: var(--golden-beige);
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .address-form {
   margin-top: 2rem;
   padding: 2rem;
@@ -1935,12 +1980,12 @@ body::after {
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.product-card {
+.products-section .product-card {
   background: rgba(233, 205, 155, 0.05);
   border: 1px solid rgba(233, 205, 155, 0.2);
   border-radius: 12px;
@@ -1948,12 +1993,12 @@ body::after {
   transition: all 0.2s ease;
 }
 
-.product-card:hover {
+.products-section .product-card:hover {
   background: rgba(233, 205, 155, 0.08);
   border-color: rgba(233, 205, 155, 0.3);
 }
 
-.product-image {
+.products-section .product-image {
   width: 100%;
   height: 120px;
   margin-bottom: 1rem;
@@ -1961,20 +2006,20 @@ body::after {
   overflow: hidden;
 }
 
-.product-image img {
+.products-section .product-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.product-info h5 {
+.products-section .product-info h5 {
   color: var(--golden-beige);
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 600;
 }
 
-.product-description {
+.products-section .product-description {
   color: var(--golden-beige);
   opacity: 0.8;
   margin: 0 0 0.5rem;
@@ -1982,14 +2027,14 @@ body::after {
   line-height: 1.4;
 }
 
-.product-price {
+.products-section .product-price {
   color: #7a3326;
   font-weight: 600;
   font-size: 1rem;
   margin-bottom: 1rem;
 }
 
-.product-actions input {
+.products-section .product-actions input {
   width: 100%;
   background: rgba(233, 205, 155, 0.1);
   border: 1px solid rgba(233, 205, 155, 0.3);
@@ -2000,7 +2045,7 @@ body::after {
   text-align: center;
 }
 
-.product-actions input:focus {
+.products-section .product-actions input:focus {
   outline: none;
   border-color: var(--golden-beige);
   background: rgba(233, 205, 155, 0.15);
@@ -2286,6 +2331,14 @@ body::after {
   .form-actions button {
     width: 100%;
     justify-content: center;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .guidelines-content {
+    grid-template-columns: 1fr;
   }
 }
 
