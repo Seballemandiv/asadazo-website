@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check, Calendar, Package, MapPin, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { SubscriptionProduct, SubscriptionSuggestion, Address } from '../types';
+import type { SubscriptionProduct, SubscriptionSuggestion, Address, Product } from '../types';
+import { products } from '../data/products';
 import Toast from '../components/Toast';
 
 const SubscriptionPage = () => {
@@ -31,6 +32,7 @@ const SubscriptionPage = () => {
   });
 
   const [suggestions, setSuggestions] = useState<SubscriptionSuggestion[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
 
   const steps = [
     { number: 1, title: 'Choose Frequency', icon: <Calendar size={20} /> },
@@ -40,12 +42,21 @@ const SubscriptionPage = () => {
     { number: 5, title: 'Review & Confirm', icon: <Check size={20} /> }
   ];
 
-  // Load product suggestions when type changes
+  // Load products and suggestions when type changes
   useEffect(() => {
     if (formData.type) {
       loadSuggestions();
+      loadProducts();
     }
   }, [formData.type]);
+
+  const loadProducts = () => {
+    // Filter products that are available for subscription (meat products)
+    const meatProducts = products.filter(product => 
+      product.category === 'meat' && product.stock > 0
+    );
+    setAvailableProducts(meatProducts);
+  };
 
   const loadSuggestions = async () => {
     try {
@@ -72,11 +83,10 @@ const SubscriptionPage = () => {
   };
 
   const handleTypeSelect = (type: 'weekly' | 'monthly' | 'custom') => {
-    const weight = type === 'weekly' ? 4 : type === 'monthly' ? 12 : 0;
     setFormData(prev => ({
       ...prev,
       type,
-      totalWeight: weight,
+      totalWeight: 0, // Let user input their own weight
       frequency: type === 'custom' ? 'monthly' : type
     }));
   };
@@ -242,28 +252,23 @@ const SubscriptionPage = () => {
         return (
           <div className="step-content">
             <h3>Select Total Weight</h3>
-            {formData.type === 'custom' ? (
-              <div className="weight-input">
-                <label>Total Weight (kg)</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  step="0.5"
-                  value={formData.totalWeight || ''}
-                  onChange={(e) => handleWeightChange(parseFloat(e.target.value) || 0)}
-                  placeholder="Enter weight in kg"
-                />
-              </div>
-            ) : (
-              <div className="weight-display">
-                <div className="weight-card">
-                  <Package size={48} />
-                  <h4>{formData.totalWeight}kg</h4>
-                  <p>{formData.type === 'weekly' ? 'Weekly delivery' : 'Monthly delivery'}</p>
-                </div>
-              </div>
-            )}
+            <div className="weight-input">
+              <label>Total Weight (kg)</label>
+              <input
+                type="number"
+                min="1"
+                max="50"
+                step="0.5"
+                value={formData.totalWeight || ''}
+                onChange={(e) => handleWeightChange(parseFloat(e.target.value) || 0)}
+                placeholder="Enter weight in kg"
+              />
+              <p className="weight-hint">
+                {formData.type === 'weekly' ? 'Recommended: 2-6kg for weekly delivery' : 
+                 formData.type === 'monthly' ? 'Recommended: 8-15kg for monthly delivery' : 
+                 'Choose any amount that works for you'}
+              </p>
+            </div>
           </div>
         );
 
@@ -354,25 +359,41 @@ const SubscriptionPage = () => {
             <h3>Choose Your Cuts</h3>
             <div className="weight-summary">
               <p>Target: {formData.totalWeight}kg | Selected: {getTotalWeight().toFixed(1)}kg</p>
+              {Math.abs(getTotalWeight() - formData.totalWeight) > 0.1 && (
+                <p className="weight-warning">
+                  {getTotalWeight() > formData.totalWeight ? 'Over target by' : 'Under target by'} {Math.abs(getTotalWeight() - formData.totalWeight).toFixed(1)}kg
+                </p>
+              )}
             </div>
             
-            <div className="suggestions-section">
-              <h4>Our Suggestions</h4>
-              <div className="suggestions-grid">
-                {suggestions.map((suggestion) => (
-                  <div key={suggestion.productId} className="suggestion-card">
-                    <h5>{suggestion.productName}</h5>
-                    <p>{suggestion.reason}</p>
-                    <div className="suggestion-actions">
+            <div className="products-section">
+              <h4>Available Cuts</h4>
+              <div className="products-grid">
+                {availableProducts.map((product) => (
+                  <div key={product.id} className="product-card">
+                    <div className="product-image">
+                      <img src={product.image} alt={product.name} loading="lazy" />
+                    </div>
+                    <div className="product-info">
+                      <h5>{product.name}</h5>
+                      <p className="product-description">{product.description}</p>
+                      <div className="product-price">€{product.price}/kg</div>
+                    </div>
+                    <div className="product-actions">
                       <input
                         type="number"
-                        min="0.5"
+                        min="0"
                         max={formData.totalWeight}
                         step="0.5"
                         placeholder="Weight (kg)"
-                        onChange={(e) => handleProductSelect(suggestion, parseFloat(e.target.value) || 0)}
+                        onChange={(e) => handleProductSelect({
+                          productId: product.id,
+                          productName: product.name,
+                          reason: '',
+                          weight: 0,
+                          price: product.price
+                        }, parseFloat(e.target.value) || 0)}
                       />
-                      <span className="price">€{suggestion.price}/kg</span>
                     </div>
                   </div>
                 ))}
@@ -385,7 +406,7 @@ const SubscriptionPage = () => {
                 <div className="selected-list">
                   {formData.selectedProducts.map((product, index) => (
                     <div key={index} className="selected-item">
-                      <span>{product.productName} - {product.weight}kg</span>
+                      <span>{product.productName} - {product.weight}kg (€{(product.weight * product.price).toFixed(2)})</span>
                       <button onClick={() => removeProduct(product.productId)}>Remove</button>
                     </div>
                   ))}
