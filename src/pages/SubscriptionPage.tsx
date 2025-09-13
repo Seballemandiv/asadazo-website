@@ -376,8 +376,6 @@ const SubscriptionPage = () => {
                         onChange={(e) => handleProductSelect({
                           productId: product.id,
                           productName: product.name,
-                          reason: '',
-                          weight: 0,
                           price: product.price
                         }, parseFloat(e.target.value) || 0)}
                       />
