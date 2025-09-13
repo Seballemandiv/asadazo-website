@@ -92,10 +92,10 @@ export interface FAQ {
 export interface Subscription {
   id: string;
   userId: string;
-  type: 'weekly' | 'monthly' | 'custom';
-  totalWeight: number; // 4kg for weekly, 12kg for monthly, custom for custom
+  type: 'weekly' | 'biweekly' | 'triweekly' | 'monthly';
+  totalWeight: number; // flexible weight based on user input
   selectedProducts: SubscriptionProduct[];
-  frequency: 'weekly' | 'monthly';
+  frequency: 'weekly' | 'biweekly' | 'triweekly' | 'monthly';
   status: 'pending review' | 'confirmed' | 'active' | 'paused' | 'cancelled';
   nextDelivery: Date;
   createdAt: Date;

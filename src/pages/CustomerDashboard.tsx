@@ -414,10 +414,12 @@ const CustomerDashboard = () => {
                     <div key={subscription.id} className="subscription-card">
                       <div className="subscription-header">
                         <div className="subscription-info">
-                          <h3>
-                            {subscription.type === 'weekly' ? 'Weekly' : 
-                             subscription.type === 'monthly' ? 'Monthly' : 'Custom'} Box
-                          </h3>
+                                 <h3>
+                                   {subscription.type === 'weekly' ? 'Weekly' :
+                                    subscription.type === 'biweekly' ? 'Bi-weekly' :
+                                    subscription.type === 'triweekly' ? 'Tri-weekly' :
+                                    subscription.type === 'monthly' ? 'Monthly' : 'Custom'} Box
+                                 </h3>
                           <p className="subscription-weight">{subscription.totalWeight}kg</p>
                         </div>
                         <div className={`subscription-status status-${subscription.status}`}>
