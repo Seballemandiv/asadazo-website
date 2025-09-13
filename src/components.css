@@ -938,7 +938,7 @@ body::after {
   margin-bottom: 1rem; 
 }
 .footer-logo img { 
-  height: 40px; 
+  height: 45px; 
   width: auto; 
 }
 
@@ -946,18 +946,18 @@ body::after {
 .footer-brand p { 
   font-size: 16px; 
   font-weight: 400; 
+  font-family: 'Arial', sans-serif; 
   color: var(--golden-beige); 
   line-height: 1.5; 
   margin: 0; 
-  font-family: 'Arial', sans-serif;
 }
 
 .footer-column h4 { 
   font-weight: 700; 
   margin-bottom: 0.8rem; 
   font-size: 1.1rem; 
+  font-family: 'Georgia', serif; 
   color: #8B4513; 
-  font-family: 'Georgia', serif;
 }
 .footer-column ul { list-style: none; padding: 0; margin: 0; }
 .footer-column li { margin-bottom: 0.4rem; }
@@ -965,8 +965,8 @@ body::after {
   color: var(--golden-beige); 
   text-decoration: none; 
   font-size: 13px; 
-  font-weight: 400;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Arial', sans-serif; 
+  font-weight: 400; 
   transition: opacity 0.2s ease; 
 }
 .footer-column a:hover { opacity: 1; text-decoration: underline; }
