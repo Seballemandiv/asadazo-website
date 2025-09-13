@@ -5,7 +5,7 @@ const Footer = () => {
         {/* Brand/About Column */}
         <div className="footer-brand">
           <div className="footer-logo">
-            <img src="/logo.png" alt="Asadazo" />
+            <img src="/logo.svg" alt="Asadazo" />
             <h3>Asadazo</h3>
           </div>
           <p>Original Argentinian cuts, butchered in the classic porteño style.</p>
