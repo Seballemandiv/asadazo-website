@@ -162,11 +162,6 @@ const SubscriptionPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
-      setToast({ message: 'Please log in to create a subscription', type: 'error' });
-      return;
-    }
-
     setIsLoading(true);
     try {
       const response = await fetch('/api/subscriptions', {
@@ -180,14 +175,19 @@ const SubscriptionPage = () => {
           frequency: formData.frequency,
           deliveryAddress: formData.deliveryAddress,
           pickupOption: formData.deliveryMethod === 'pickup',
-          notes: formData.notes
+          notes: formData.notes,
+          userEmail: user?.email || 'guest@asadazo.nl' // Use user email if logged in, otherwise guest
         })
       });
 
       if (response.ok) {
         setToast({ message: 'Subscription created successfully! It will be reviewed shortly.', type: 'success' });
         setTimeout(() => {
-          navigate('/account');
+          if (user) {
+            navigate('/account');
+          } else {
+            navigate('/');
+          }
         }, 2000);
       } else {
         const error = await response.json();

@@ -67,16 +67,11 @@ function App() {
                   <RegisterPage />
                 </AppShell>
               } />
-              <Route
-                path="/subscriptions"
-                element={
-                  <ProtectedRoute>
-                    <AppShell>
-                      <SubscriptionPage />
-                    </AppShell>
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/subscriptions" element={
+                <AppShell>
+                  <SubscriptionPage />
+                </AppShell>
+              } />
               <Route
                 path="/account"
                 element={
