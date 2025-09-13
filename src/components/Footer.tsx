@@ -6,9 +6,8 @@ const Footer = () => {
         <div className="footer-brand">
           <div className="footer-logo">
             <img src="/logo.svg" alt="Asadazo" />
-            <h3>Asadazo</h3>
           </div>
-          <p>Original Argentinian cuts, butchered in the classic porteño style.</p>
+          <p>Original Argentinian cuts, with the highest quality.</p>
         </div>
 
         {/* Shop Column */}
@@ -23,11 +22,11 @@ const Footer = () => {
 
         {/* Visit Column */}
         <div className="footer-column">
-          <h4>Visit</h4>
+          <h4>Book the Argentinian experience</h4>
           <ul>
-            <li><a href="#showroom">Showroom & Tastings</a></li>
-            <li><a href="/about">Our Story</a></li>
-            <li><a href="#journal">Journal</a></li>
+            <li><a href="#corporate">Corporative events</a></li>
+            <li><a href="#social">Social events</a></li>
+            <li><a href="#home">Home events</a></li>
           </ul>
         </div>
 
@@ -35,9 +34,10 @@ const Footer = () => {
         <div className="footer-column">
           <h4>Contact</h4>
           <ul>
-            <li><a href="mailto:allemandi.Sebastian@expandam.nl">allemandi.Sebastian@expandam.nl</a></li>
-            <li><a href="tel:+31612345678">+31 (0) 6 12345678</a></li>
-            <li>Amsterdam Oost, Netherlands</li>
+            <li><a href="mailto:info@asadazo.nl">info@asadazo.nl</a></li>
+            <li><a href="tel:+31627830723">+31 (0) 6 2783 0723</a></li>
+            <li>Panamalaan 125, 1019 AS.</li>
+            <li>Amsterdam, The Netherlands</li>
           </ul>
         </div>
       </div>
