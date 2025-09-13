@@ -25,7 +25,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <div className="product-card">
-      <div className="product-image">
+      <div className="product-image.pngimage">
         <img
           src={product.image || '/images/Products/Asado.jpg'}
           alt={product.name}
@@ -99,9 +99,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
           
           <div className="product-minimum">
             <span className="min-pack">Min: {product.minPack}kg</span>
-            {product.stock > 0 && (
-              <span className="stock-info">Stock: {product.stock}kg</span>
-            )}
           </div>
         </div>
 
