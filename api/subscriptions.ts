@@ -3,7 +3,7 @@ import { kv } from './_kv.js';
 import jwt from 'jsonwebtoken';
 import type { Subscription, SubscriptionProduct, Address } from '../src/types/index.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
+const JWT_SECRET = (process as any).env.JWT_SECRET || 'fallback-secret';
 
 // Helper function to get user from session
 async function getUserFromSession(req: VercelRequest) {
@@ -106,13 +106,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Send email notification
       try {
         const { Resend } = await import('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
+        const resend = new Resend((process as any).env.RESEND_API_KEY);
         
         const totalPrice = selectedProducts.reduce((sum, product) => sum + (product.weight * product.price), 0);
         
         await resend.emails.send({
           from: 'Asadazo <noreply@asadazo.nl>',
-          to: [process.env.TO_EMAIL || 'info@asadazo.nl'],
+          to: [(process as any).env.TO_EMAIL || 'info@asadazo.nl'],
           subject: `New Subscription Request - ${subscription.id}`,
           html: `
             <h2>New Subscription Request</h2>
@@ -154,7 +154,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-    if (req.method === 'PUT') {
+  if (req.method === 'PUT') {
+    try {
+      const user = await getUserFromSession(req);
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const { subscriptionId, updates } = req.body;
 
       if (!subscriptionId) {
@@ -183,9 +189,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         subscription: updatedSubscriptions[subscriptionIndex],
         message: 'Subscription updated successfully' 
       });
+    } catch (error) {
+      console.error('Error updating subscription:', error);
+      return res.status(500).json({ error: 'Internal server error' });
     }
+  }
 
-    if (req.method === 'DELETE') {
+  if (req.method === 'DELETE') {
+    try {
+      const user = await getUserFromSession(req);
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
       const subscriptionId = req.query.id as string;
 
       if (!subscriptionId) {
@@ -210,11 +226,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         success: true, 
         message: 'Subscription cancelled successfully' 
       });
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      return res.status(500).json({ error: 'Internal server error' });
     }
-
-    return res.status(405).json({ error: 'Method not allowed' });
-  } catch (error) {
-    console.error('Error in subscriptions API:', error);
-    return res.status(500).json({ error: 'Internal server error' });
   }
+
+  return res.status(405).json({ error: 'Method not allowed' });
 }
