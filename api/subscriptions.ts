@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       totalWeight,
       selectedProducts,
       frequency,
-      status: 'active',
+      status: 'pending review',
       nextDelivery: new Date(Date.now() + (frequency === 'weekly' ? 7 : 30) * 24 * 60 * 60 * 1000),
       createdAt: new Date(),
       lastModified: new Date(),

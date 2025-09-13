@@ -96,7 +96,7 @@ export interface Subscription {
   totalWeight: number; // 4kg for weekly, 12kg for monthly, custom for custom
   selectedProducts: SubscriptionProduct[];
   frequency: 'weekly' | 'monthly';
-  status: 'active' | 'paused' | 'cancelled';
+  status: 'pending review' | 'confirmed' | 'active' | 'paused' | 'cancelled';
   nextDelivery: Date;
   createdAt: Date;
   lastModified: Date;
