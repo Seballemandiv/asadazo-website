@@ -88,3 +88,35 @@ export interface FAQ {
   answer: string;
   category: 'general' | 'delivery' | 'products' | 'allergens';
 }
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  type: 'weekly' | 'monthly' | 'custom';
+  totalWeight: number; // 4kg for weekly, 12kg for monthly, custom for custom
+  selectedProducts: SubscriptionProduct[];
+  frequency: 'weekly' | 'monthly';
+  status: 'active' | 'paused' | 'cancelled';
+  nextDelivery: Date;
+  createdAt: Date;
+  lastModified: Date;
+  notes?: string;
+  deliveryAddress: Address;
+  pickupOption?: boolean;
+}
+
+export interface SubscriptionProduct {
+  productId: string;
+  productName: string;
+  weight: number; // in kg
+  price: number;
+  isSuggestion?: boolean; // true if it's our suggestion, false if customer chose
+}
+
+export interface SubscriptionSuggestion {
+  productId: string;
+  productName: string;
+  reason: string; // why we suggest this product
+  weight: number;
+  price: number;
+}
