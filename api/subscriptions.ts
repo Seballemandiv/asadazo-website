@@ -1,9 +1,22 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+// VercelRequest and VercelResponse types
+interface VercelRequest {
+  method?: string;
+  body?: any;
+  query?: { [key: string]: string | string[] | undefined };
+  cookies?: { [key: string]: string };
+}
+
+interface VercelResponse {
+  status: (code: number) => VercelResponse;
+  json: (data: any) => void;
+  setHeader: (name: string, value: string) => void;
+  end: () => void;
+}
 import { kv } from './_kv.js';
 import jwt from 'jsonwebtoken';
 import type { Subscription, SubscriptionProduct, Address } from '../src/types/index.js';
 
-const JWT_SECRET = (process as any).env.JWT_SECRET || 'fallback-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
 // Helper function to get user from session
 async function getUserFromSession(req: VercelRequest) {
@@ -106,13 +119,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Send email notification
       try {
         const { Resend } = await import('resend');
-        const resend = new Resend((process as any).env.RESEND_API_KEY);
+        const resend = new Resend(process.env.RESEND_API_KEY);
         
         const totalPrice = selectedProducts.reduce((sum, product) => sum + (product.weight * product.price), 0);
         
         await resend.emails.send({
           from: 'Asadazo <noreply@asadazo.nl>',
-          to: [(process as any).env.TO_EMAIL || 'info@asadazo.nl'],
+          to: [process.env.TO_EMAIL || 'info@asadazo.nl'],
           subject: `New Subscription Request - ${subscription.id}`,
           html: `
             <h2>New Subscription Request</h2>

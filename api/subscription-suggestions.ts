@@ -1,12 +1,37 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { products } from '../src/data/products';
-import type { SubscriptionSuggestion } from '../src/types';
+// VercelRequest and VercelResponse types
+interface VercelRequest {
+  method?: string;
+  body?: any;
+  query?: { [key: string]: string | string[] | undefined };
+  cookies?: { [key: string]: string };
+}
+
+interface VercelResponse {
+  status: (code: number) => VercelResponse;
+  json: (data: any) => void;
+  setHeader: (name: string, value: string) => void;
+  end: () => void;
+}
+
+import { products } from '../src/data/products.js';
+import type { SubscriptionSuggestion } from '../src/types/index.js';
 
 // GET /api/subscription-suggestions - Get product suggestions for subscriptions
-export async function GET(request: NextRequest) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // 'weekly' or 'monthly'
+    const type = req.query.type as string; // 'weekly' or 'monthly'
     const totalWeight = type === 'weekly' ? 4 : 12;
 
     // Get all meat products for suggestions
@@ -83,25 +108,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
+    return res.status(200).json({ 
       suggestions: availableSuggestions,
       totalWeight: availableSuggestions.reduce((sum, s) => sum + s.weight, 0),
       targetWeight: totalWeight
     });
   } catch (error) {
     console.error('Error fetching subscription suggestions:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return res.status(500).json({ error: 'Internal server error' });
   }
-}
-
-// Handle CORS
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
 }
