@@ -41,6 +41,13 @@ const SubscriptionPage = () => {
     { number: 5, title: 'Review & Confirm', icon: <Check size={20} /> }
   ];
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/login?return=/subscriptions');
+    }
+  }, [user, navigate]);
+
   // Load products when type changes
   useEffect(() => {
     if (formData.type) {
@@ -175,8 +182,7 @@ const SubscriptionPage = () => {
           frequency: formData.frequency,
           deliveryAddress: formData.deliveryAddress,
           pickupOption: formData.deliveryMethod === 'pickup',
-          notes: formData.notes,
-          userEmail: user?.email || 'guest@asadazo.nl' // Use user email if logged in, otherwise guest
+          notes: formData.notes
         })
       });
 
