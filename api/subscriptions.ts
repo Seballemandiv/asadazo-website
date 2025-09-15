@@ -69,6 +69,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
+
+      // Admin can fetch site-wide subscriptions if ?all=true
+      const isAdmin = user.role === 'admin';
+      const allFlag = req.query?.all === 'true' || req.query?.all === '1';
+      if (isAdmin && allFlag) {
+        const rawIndex = (await kv.get('subscriptions_index')) || [];
+        let indexArr: Array<{ id: string; userId: string }> = [];
+        if (Array.isArray(rawIndex)) indexArr = rawIndex as any;
+        else if (typeof rawIndex === 'string') indexArr = JSON.parse(rawIndex);
+
+        // Collect subscriptions by user buckets
+        const result: Subscription[] = [];
+        const grouped: Record<string, string[]> = {};
+        for (const entry of indexArr) {
+          if (!grouped[entry.userId]) grouped[entry.userId] = [];
+          grouped[entry.userId].push(entry.id);
+        }
+        for (const [uid, ids] of Object.entries(grouped)) {
+          const bucket = (await kv.get(`subscriptions:${uid}`)) || [];
+          const arr = Array.isArray(bucket) ? (bucket as Subscription[]) : JSON.parse(bucket as any);
+          for (const sub of arr) if (ids.includes(sub.id)) result.push({ ...sub, userId: uid });
+        }
+        return res.status(200).json({ subscriptions: result });
+      }
+
+      // Default: return own subscriptions
       const existing = (await kv.get(`subscriptions:${user.id}`)) || [];
       return res.status(200).json({ subscriptions: existing as Subscription[] });
     } catch (error) {
@@ -135,6 +161,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const current = (await kv.get(`subscriptions:${user.id}`)) || [];
       const updatedUserSubscriptions = [...(Array.isArray(current) ? (current as Subscription[]) : []), subscription];
       await kv.set(`subscriptions:${user.id}`, JSON.stringify(updatedUserSubscriptions));
+
+      // Minimal global index for admin listing
+      try {
+        const rawIndex = (await kv.get('subscriptions_index')) || [];
+        let indexArr: Array<{ id: string; userId: string }> = [];
+        if (Array.isArray(rawIndex)) indexArr = rawIndex as any;
+        else if (typeof rawIndex === 'string') indexArr = JSON.parse(rawIndex);
+        if (!indexArr.some(e => e.id === subscription.id)) {
+          indexArr.push({ id: subscription.id, userId: user.id });
+          await kv.set('subscriptions_index', JSON.stringify(indexArr));
+        }
+      } catch (e) {
+        console.error('Failed updating subscriptions_index', e);
+      }
 
       // Send email notification
       try {

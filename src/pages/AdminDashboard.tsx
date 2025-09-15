@@ -165,9 +165,7 @@ const AdminDashboard = () => {
   // Load all users' subscriptions (admin view)
   const loadSubscriptions = async () => {
     try {
-      // For now we don’t have a global list. In real setup we’d store an index. As a workaround, we try common user lists if backend exposes them later.
-      // Placeholder: show only current user's subscriptions as proof-of-flow for status buttons
-      const res = await fetch('/api/subscriptions');
+      const res = await fetch('/api/subscriptions?all=true');
       if (res.ok) {
         const data = await res.json();
         setAdminSubscriptions(
