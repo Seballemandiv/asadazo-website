@@ -33,7 +33,16 @@ async function getUserFromSession(req: VercelRequest) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     const user = await kv.get(kvUsersKey(decoded.email));
-    return user ? JSON.parse(user as string) : null;
+    if (!user) return null;
+    // KV may return a plain object or a JSON string depending on how it was stored
+    if (typeof user === 'string') {
+      try {
+        return JSON.parse(user);
+      } catch {
+        return null;
+      }
+    }
+    return user as any;
   } catch {
     return null;
   }
