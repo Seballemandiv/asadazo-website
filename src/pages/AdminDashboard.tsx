@@ -80,12 +80,22 @@ const MOCK_ORDERS: Order[] = [
   }
 ];
 
+type AdminSubscription = {
+  id: string;
+  userId: string;
+  type: string;
+  frequency: string;
+  totalWeight: number;
+  status: 'pending review' | 'confirmed' | 'active' | 'paused' | 'cancelled';
+  createdAt: string | Date;
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [orders] = useState<Order[]>(MOCK_ORDERS);
-  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'users' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'subscriptions' | 'users' | 'settings'>('products');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -104,6 +114,7 @@ const AdminDashboard = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [adminSubscriptions, setAdminSubscriptions] = useState<AdminSubscription[]>([]);
 
   // Use versioned storage key to prevent stale products from older deployments
   const PRODUCTS_STORAGE_KEY = 'asadazo_products_v3';
@@ -149,6 +160,51 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  // Load all users' subscriptions (admin view)
+  const loadSubscriptions = async () => {
+    try {
+      // For now we don’t have a global list. In real setup we’d store an index. As a workaround, we try common user lists if backend exposes them later.
+      // Placeholder: show only current user's subscriptions as proof-of-flow for status buttons
+      const res = await fetch('/api/subscriptions');
+      if (res.ok) {
+        const data = await res.json();
+        setAdminSubscriptions(
+          (data.subscriptions || []).map((s: any) => ({
+            ...s,
+            createdAt: typeof s.createdAt === 'string' ? s.createdAt : new Date(s.createdAt).toISOString()
+          }))
+        );
+      }
+    } catch (e) {
+      console.error('load subscriptions failed', e);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'subscriptions') {
+      loadSubscriptions();
+    }
+  }, [activeTab]);
+
+  const updateSubscriptionStatus = async (sub: AdminSubscription, status: AdminSubscription['status']) => {
+    try {
+      const res = await fetch('/api/subscriptions', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscriptionId: sub.id, updates: { status }, adminOverride: true, targetUserId: sub.userId })
+      });
+      if (res.ok) {
+        showToastMessage('Subscription updated', 'success');
+        loadSubscriptions();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToastMessage(err?.error || 'Failed to update', 'error');
+      }
+    } catch (e) {
+      showToastMessage('Failed to update', 'error');
+    }
   };
 
   const handleAddProduct = () => {
@@ -299,6 +355,13 @@ const AdminDashboard = () => {
             Orders
           </button>
           <button 
+            className={`admin-tab ${activeTab === 'subscriptions' ? 'active' : ''}`}
+            onClick={() => setActiveTab('subscriptions')}
+          >
+            <CheckCircle size={16} />
+            Subscriptions
+          </button>
+          <button 
             className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
@@ -447,6 +510,40 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'subscriptions' && (
+          <div className="admin-section">
+            <h2>Manage Subscriptions</h2>
+            <div className="admin-products-grid">
+              {adminSubscriptions.length === 0 ? (
+                <div className="admin-placeholder">
+                  <CheckCircle size={48} />
+                  <h3>No subscriptions found</h3>
+                  <button onClick={loadSubscriptions} className="admin-add-btn">Refresh</button>
+                </div>
+              ) : (
+                adminSubscriptions.map((sub) => (
+                  <div key={sub.id} className="admin-product-card">
+                    <div className="admin-product-info">
+                      <h3>{sub.type} • {sub.frequency}</h3>
+                      <div className="product-details">
+                        <span>Status: {sub.status}</span>
+                        <span>Weight: {sub.totalWeight}kg</span>
+                        <span>User: {sub.userId}</span>
+                      </div>
+                      <div className="stock-control">
+                        <button onClick={() => updateSubscriptionStatus(sub, 'confirmed')} className="stock-btn">Confirm</button>
+                        <button onClick={() => updateSubscriptionStatus(sub, 'active')} className="stock-btn">Activate</button>
+                        <button onClick={() => updateSubscriptionStatus(sub, 'paused')} className="stock-btn">Pause</button>
+                        <button onClick={() => updateSubscriptionStatus(sub, 'cancelled')} className="stock-btn">Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
