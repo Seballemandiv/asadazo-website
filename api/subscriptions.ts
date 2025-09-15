@@ -53,33 +53,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
-      // Load existing user-scoped subscriptions
       const existing = (await kv.get(`subscriptions:${user.id}`)) || [];
-
-      // Auto-link any pending subscriptions created as guest using the same email
-      const pendingRaw = (await kv.get('pending_subscriptions')) || [];
-      const pendingList: Subscription[] = Array.isArray(pendingRaw)
-        ? (pendingRaw as Subscription[])
-        : (() => { try { return JSON.parse(pendingRaw as unknown as string) as Subscription[]; } catch { return []; } })();
-
-      const toLink = pendingList.filter((s) => s.userId && typeof s.userId === 'string' && s.userId.toLowerCase() === (user.email || '').toLowerCase());
-
-      let merged: Subscription[] = Array.isArray(existing) ? (existing as Subscription[]) : [];
-      if (toLink.length > 0) {
-        // Avoid duplicates by id
-        const existingIds = new Set(merged.map((s) => s.id));
-        const uniqueToAdd = toLink.filter((s) => !existingIds.has(s.id));
-        if (uniqueToAdd.length > 0) {
-          merged = [...merged, ...uniqueToAdd];
-          await kv.set(`subscriptions:${user.id}`, JSON.stringify(merged));
-        }
-
-        // Remove linked ones from pending
-        const remainingPending = pendingList.filter((s) => !toLink.some((l) => l.id === s.id));
-        await kv.set('pending_subscriptions', JSON.stringify(remainingPending));
-      }
-
-      return res.status(200).json({ subscriptions: merged });
+      return res.status(200).json({ subscriptions: existing as Subscription[] });
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
       return res.status(500).json({ error: 'Internal server error' });
@@ -88,9 +63,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'POST') {
     try {
-      // For POST, we'll create subscription without requiring login first
-      // The subscription will be linked to user when they log in
-      const { type, selectedProducts, frequency, deliveryAddress, pickupOption, notes, userEmail } = req.body;
+      // Require login for creating subscriptions
+      const user = await getUserFromSession(req);
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized. Please log in to create a subscription.' });
+      }
+
+      const { type, selectedProducts, frequency, deliveryAddress, pickupOption, notes } = req.body;
 
       // Validate required fields
       if (!type || !selectedProducts || !frequency || !deliveryAddress) {
@@ -119,10 +98,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           break;
       }
 
-      // Create subscription with temporary ID (will be linked to user later)
+      // Create subscription under the logged-in user
       const subscription: Subscription = {
         id: generateSubscriptionId(),
-        userId: userEmail || 'temp', // Use email as temporary identifier
+        userId: user.id,
         type,
         totalWeight,
         selectedProducts,
@@ -136,10 +115,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         pickupOption
       };
 
-      // Save subscription to pending subscriptions (not user-specific yet)
-      const pendingSubscriptions = await kv.get('pending_subscriptions') || [];
-      const updatedPendingSubscriptions = [...(pendingSubscriptions as Subscription[]), subscription];
-      await kv.set('pending_subscriptions', JSON.stringify(updatedPendingSubscriptions));
+      // Save subscription directly to the user's list
+      const current = (await kv.get(`subscriptions:${user.id}`)) || [];
+      const updatedUserSubscriptions = [...(Array.isArray(current) ? (current as Subscription[]) : []), subscription];
+      await kv.set(`subscriptions:${user.id}`, JSON.stringify(updatedUserSubscriptions));
 
       // Send email notification
       try {
@@ -160,7 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             <p><strong>Total Weight:</strong> ${subscription.totalWeight}kg</p>
             <p><strong>Total Price:</strong> €${totalPrice.toFixed(2)}</p>
             <p><strong>Delivery Method:</strong> ${subscription.pickupOption ? 'Pickup' : 'Delivery'}</p>
-            <p><strong>Customer Email:</strong> ${userEmail || 'Not provided'}</p>
+            <p><strong>Customer Email:</strong> ${user.email || 'Not provided'}</p>
             
             <h3>Selected Products:</h3>
             <ul>
