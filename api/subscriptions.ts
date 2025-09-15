@@ -53,8 +53,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!user) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
-      const subscriptions = await kv.get(`subscriptions:${user.id}`) || [];
-      return res.status(200).json({ subscriptions: subscriptions as Subscription[] });
+      // Load existing user-scoped subscriptions
+      const existing = (await kv.get(`subscriptions:${user.id}`)) || [];
+
+      // Auto-link any pending subscriptions created as guest using the same email
+      const pendingRaw = (await kv.get('pending_subscriptions')) || [];
+      const pendingList: Subscription[] = Array.isArray(pendingRaw)
+        ? (pendingRaw as Subscription[])
+        : (() => { try { return JSON.parse(pendingRaw as unknown as string) as Subscription[]; } catch { return []; } })();
+
+      const toLink = pendingList.filter((s) => s.userId && typeof s.userId === 'string' && s.userId.toLowerCase() === (user.email || '').toLowerCase());
+
+      let merged: Subscription[] = Array.isArray(existing) ? (existing as Subscription[]) : [];
+      if (toLink.length > 0) {
+        // Avoid duplicates by id
+        const existingIds = new Set(merged.map((s) => s.id));
+        const uniqueToAdd = toLink.filter((s) => !existingIds.has(s.id));
+        if (uniqueToAdd.length > 0) {
+          merged = [...merged, ...uniqueToAdd];
+          await kv.set(`subscriptions:${user.id}`, JSON.stringify(merged));
+        }
+
+        // Remove linked ones from pending
+        const remainingPending = pendingList.filter((s) => !toLink.some((l) => l.id === s.id));
+        await kv.set('pending_subscriptions', JSON.stringify(remainingPending));
+      }
+
+      return res.status(200).json({ subscriptions: merged });
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
       return res.status(500).json({ error: 'Internal server error' });
