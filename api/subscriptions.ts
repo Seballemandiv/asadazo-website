@@ -13,7 +13,7 @@ interface VercelResponse {
   setHeader: (name: string, value: string) => void;
   end: () => void;
 }
-import { kv } from './_kv.js';
+import { kv, kvUsersKey } from './_kv.js';
 import jwt from 'jsonwebtoken';
 import type { Subscription, SubscriptionProduct, Address } from '../src/types/index.js';
 
@@ -32,7 +32,7 @@ async function getUserFromSession(req: VercelRequest) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    const user = await kv.get(`user:${decoded.email}`);
+    const user = await kv.get(kvUsersKey(decoded.email));
     return user ? JSON.parse(user as string) : null;
   } catch {
     return null;
