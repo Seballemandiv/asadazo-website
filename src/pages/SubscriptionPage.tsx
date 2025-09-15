@@ -176,6 +176,7 @@ const SubscriptionPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           type: formData.type,
           selectedProducts: formData.selectedProducts,
