@@ -1,20 +1,63 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, User, Plus, Edit, Trash2, MapPin, LogOut, Calendar } from 'lucide-react';
+import { Package, CreditCard, User, Plus, LogOut, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { Order, Subscription } from '../types';
+import type { Order, PaymentMethod, Subscription } from '../types';
 import Toast from '../components/Toast';
 
 // Orders are stored locally for now
 const ORDERS_STORAGE_KEY = 'asadazo_orders';
 
-// Payment methods UI removed per request
+const MOCK_PAYMENT_METHODS: PaymentMethod[] = [
+  {
+    id: '1',
+    type: 'card',
+    last4: '1234',
+    brand: 'Visa',
+    isDefault: true
+  },
+  {
+    id: '2',
+    type: 'card',
+    last4: '5678',
+    brand: 'American Express',
+    isDefault: false
+  },
+  {
+    id: '3',
+    type: 'bank_transfer',
+    iban: 'NL91ABNA0417164300',
+    accountHolder: 'John Doe',
+    isDefault: false
+  },
+  {
+    id: '4',
+    type: 'klarna',
+    isDefault: false
+  },
+  {
+    id: '5',
+    type: 'ideal',
+    idealBank: 'INGBNL2A',
+    isDefault: false
+  }
+];
 
-// Payment method state removed
+type PaymentFormData = {
+  type: 'card' | 'bank_transfer' | 'klarna' | 'ideal';
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+  cardholderName: string;
+  iban: string;
+  accountHolder: string;
+  idealBank: string;
+};
 
-const tabs: Array<{ key: 'orders' | 'subscriptions' | 'profile' | 'logout'; label: string; icon: React.ReactNode }> = [
+const tabs: Array<{ key: 'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'; label: string; icon: React.ReactNode }> = [
   { key: 'orders', label: 'Orders', icon: <Package size={16} /> },
   { key: 'subscriptions', label: 'Subscriptions', icon: <Calendar size={16} /> },
+  { key: 'payment', label: 'Payment Methods', icon: <CreditCard size={16} /> },
   { key: 'profile', label: 'Profile', icon: <User size={16} /> },
   { key: 'logout', label: 'Logout', icon: <LogOut size={16} /> },
 ];
@@ -24,12 +67,54 @@ const CustomerDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'profile' | 'logout'>('subscriptions');
+  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'>('orders');
+  const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
+  const [newPaymentMethod, setNewPaymentMethod] = useState<PaymentFormData>({
+    type: 'card',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    cardholderName: '',
+    iban: '',
+    accountHolder: '',
+    idealBank: ''
+  });
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Payment UI removed
+  const getPaymentMethodIcon = (type: string) => {
+    switch (type) {
+      case 'card': return <CreditCard size={20} />;
+      case 'bank_transfer': return <MapPin size={20} />;
+      case 'klarna': return <span className="klarna-icon">K</span>;
+      case 'ideal': return <span className="ideal-icon">iDEAL</span>;
+      default: return <CreditCard size={20} />;
+    }
+  };
 
-  // Payment handlers removed
+  const handleAddPaymentMethod = () => {
+    setShowAddPaymentModal(false);
+    setNewPaymentMethod({
+      type: 'card',
+      cardNumber: '',
+      expiryDate: '',
+      cvv: '',
+      cardholderName: '',
+      iban: '',
+      accountHolder: '',
+      idealBank: ''
+    });
+    setToast({ message: 'Payment method added', type: 'success' });
+  };
+
+  const handleDeletePaymentMethod = (id: string) => {
+    console.log('Deleting payment method:', id);
+    setToast({ message: 'Payment method removed', type: 'success' });
+  };
+
+  const handleSetDefaultPaymentMethod = (id: string) => {
+    console.log('Setting default payment method:', id);
+    setToast({ message: 'Default payment method updated', type: 'success' });
+  };
 
   const onKeyDownTabs = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = tabs.findIndex(t => t.key === activeTab);
@@ -67,9 +152,9 @@ const CustomerDashboard = () => {
         if (saved) setOrders(JSON.parse(saved));
       } catch {}
 
-      // Load subscriptions (include credentials)
+      // Load subscriptions
       try {
-        const subRes = await fetch('/api/subscriptions', { credentials: 'include' });
+        const subRes = await fetch('/api/subscriptions');
         if (subRes.ok) {
           const subData = await subRes.json();
           if (Array.isArray(subData.subscriptions)) {
@@ -170,7 +255,61 @@ const CustomerDashboard = () => {
             </div>
           )}
 
-          {/* Payment Methods section removed */}
+          {activeTab === 'payment' && (
+            <div id="panel-payment" role="tabpanel" aria-labelledby="tab-payment" className="payment-section">
+              <div className="section-header">
+                <h2>Payment Methods</h2>
+                <button 
+                  className="add-button"
+                  onClick={() => setShowAddPaymentModal(true)}
+                >
+                  <Plus size={16} />
+                  Add Payment Method
+                </button>
+              </div>
+
+              <div className="payment-methods-list">
+                {MOCK_PAYMENT_METHODS.map(method => (
+                  <div key={method.id} className="payment-method-card">
+                    <div className="payment-method-info">
+                      <div className="card-icon">
+                        {getPaymentMethodIcon(method.type)}
+                      </div>
+                      <div className="card-details">
+                        <h4>{method.type === 'card' ? `${method.brand} •••• ${method.last4}` : method.type}</h4>
+                        {method.isDefault && (
+                          <span className="default-badge">Default</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="payment-method-actions">
+                      {!method.isDefault && (
+                        <button 
+                          className="set-default-button"
+                          onClick={() => handleSetDefaultPaymentMethod(method.id)}
+                        >
+                          Set Default
+                        </button>
+                      )}
+                      <button 
+                        className="edit-button"
+                        onClick={() => console.log('Edit payment method:', method.id)}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        className="delete-button"
+                        onClick={() => handleDeletePaymentMethod(method.id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {activeTab === 'profile' && (
             <div id="panel-profile" role="tabpanel" aria-labelledby="tab-profile" className="profile-section">
@@ -342,7 +481,181 @@ const CustomerDashboard = () => {
         </div>
       </div>
 
-      {/* Payment modal removed */}
+      {/* Add Payment Method Modal */}
+      {showAddPaymentModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>Add Payment Method</h2>
+              <button 
+                className="close-btn"
+                onClick={() => setShowAddPaymentModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="modal-content">
+              <div className="payment-type-selector">
+                <button 
+                  className={`payment-type-btn ${newPaymentMethod.type === 'card' ? 'active' : ''}`}
+                  onClick={() => setNewPaymentMethod(prev => ({ ...prev, type: 'card' }))}
+                >
+                  <CreditCard size={20} />
+                  Credit Card
+                </button>
+                <button 
+                  className={`payment-type-btn ${newPaymentMethod.type === 'bank_transfer' ? 'active' : ''}`}
+                  onClick={() => setNewPaymentMethod(prev => ({ ...prev, type: 'bank_transfer' }))}
+                >
+                  <span className="bank-icon">🏦</span>
+                  SEPA Transfer
+                </button>
+                <button 
+                  className={`payment-type-btn ${newPaymentMethod.type === 'klarna' ? 'active' : ''}`}
+                  onClick={() => setNewPaymentMethod(prev => ({ ...prev, type: 'klarna' }))}
+                >
+                  <span className="klarna-icon">K</span>
+                  Klarna
+                </button>
+                <button 
+                  className={`payment-type-btn ${newPaymentMethod.type === 'ideal' ? 'active' : ''}`}
+                  onClick={() => setNewPaymentMethod(prev => ({ ...prev, type: 'ideal' }))}
+                >
+                  <span className="ideal-icon">iDEAL</span>
+                  iDEAL
+                </button>
+              </div>
+
+              {newPaymentMethod.type === 'card' && (
+                <div className="card-form">
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Card Number</label>
+                      <input 
+                        type="text" 
+                        placeholder="1234 5678 9012 3456"
+                        value={newPaymentMethod.cardNumber}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, cardNumber: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Expiry Date</label>
+                      <input 
+                        type="text" 
+                        placeholder="MM/YY"
+                        value={newPaymentMethod.expiryDate}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, expiryDate: e.target.value }))}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>CVV</label>
+                      <input 
+                        type="text" 
+                        placeholder="123"
+                        value={newPaymentMethod.cvv}
+                        onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, cvv: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Cardholder Name</label>
+                    <input 
+                      type="text" 
+                      placeholder="John Doe"
+                      value={newPaymentMethod.cardholderName}
+                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, cardholderName: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {newPaymentMethod.type === 'bank_transfer' && (
+                <div className="bank-form">
+                  <div className="form-group">
+                    <label>IBAN</label>
+                    <input 
+                      type="text" 
+                      placeholder="NL91ABNA0417164300"
+                      value={newPaymentMethod.iban}
+                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, iban: e.target.value }))}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Account Holder Name</label>
+                    <input 
+                      type="text" 
+                      placeholder="John Doe"
+                      value={newPaymentMethod.accountHolder}
+                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, accountHolder: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {newPaymentMethod.type === 'klarna' && (
+                <div className="klarna-form">
+                  <div className="klarna-info">
+                    <p>Pay later with Klarna. No fees, no interest.</p>
+                  </div>
+                  <div className="klarna-benefits">
+                    <ul>
+                      <li>Pay in 30 days</li>
+                      <li>No fees or interest</li>
+                      <li>Secure checkout</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {newPaymentMethod.type === 'ideal' && (
+                <div className="ideal-form">
+                  <div className="form-group">
+                    <label>Select Bank</label>
+                    <select 
+                      value={newPaymentMethod.idealBank}
+                      onChange={(e) => setNewPaymentMethod(prev => ({ ...prev, idealBank: e.target.value }))}
+                    >
+                      <option value="">Select your bank</option>
+                      <option value="INGBNL2A">ING Bank</option>
+                      <option value="RABONL2U">Rabobank</option>
+                      <option value="ABNANL2A">ABN AMRO</option>
+                      <option value="TRIBNL2U">Triodos Bank</option>
+                    </select>
+                  </div>
+                  <div className="ideal-info">
+                    <p>Pay directly from your bank account with iDEAL.</p>
+                  </div>
+                  <div className="ideal-benefits">
+                    <ul>
+                      <li>Instant payment</li>
+                      <li>No additional fees</li>
+                      <li>Secure bank transfer</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              <div className="modal-actions">
+                <button 
+                  className="cancel-btn"
+                  onClick={() => setShowAddPaymentModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="save-btn"
+                  onClick={handleAddPaymentMethod}
+                >
+                  Add Payment Method
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toast && (
         <Toast
