@@ -190,17 +190,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'PUT') {
     try {
       const user = await getUserFromSession(req);
-      if (!user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
+      if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
-      const { subscriptionId, updates } = req.body;
+      const { subscriptionId, updates, adminOverride } = req.body;
 
       if (!subscriptionId) {
         return res.status(400).json({ error: 'Subscription ID required' });
       }
 
-      const subscriptions = await kv.get(`subscriptions:${user.id}`) || [];
+      // Admin can update any user's subscription by passing adminOverride=true and targetUserId
+      const targetUserId = adminOverride && user.role === 'admin' && req.body.targetUserId ? req.body.targetUserId : user.id;
+      const subscriptions = await kv.get(`subscriptions:${targetUserId}`) || [];
       const subscriptionIndex = (subscriptions as Subscription[]).findIndex((sub: Subscription) => sub.id === subscriptionId);
 
       if (subscriptionIndex === -1) {
@@ -215,7 +215,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         lastModified: new Date()
       };
 
-      await kv.set(`subscriptions:${user.id}`, JSON.stringify(updatedSubscriptions));
+      await kv.set(`subscriptions:${targetUserId}`, JSON.stringify(updatedSubscriptions));
 
       return res.status(200).json({ 
         success: true, 
