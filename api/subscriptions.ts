@@ -4,6 +4,7 @@ interface VercelRequest {
   body?: any;
   query?: { [key: string]: string | string[] | undefined };
   cookies?: { [key: string]: string };
+  headers?: { [key: string]: string | undefined };
 }
 
 interface VercelResponse {
@@ -20,7 +21,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
 
 // Helper function to get user from session
 async function getUserFromSession(req: VercelRequest) {
-  const token = req.cookies?.session;
+  // Try cookie object first (local dev), then raw header (production)
+  let token = req.cookies?.session;
+  if (!token) {
+    const raw = req.headers?.cookie || '';
+    const match = raw.match(/session=([^;]+)/);
+    token = match ? match[1] : undefined;
+  }
   if (!token) return null;
 
   try {
