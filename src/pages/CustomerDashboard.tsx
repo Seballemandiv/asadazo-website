@@ -1,63 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, CreditCard, User, Plus, Edit, Trash2, MapPin, LogOut, Calendar } from 'lucide-react';
+import { Package, User, Plus, Edit, Trash2, MapPin, LogOut, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import type { Order, PaymentMethod, Subscription } from '../types';
+import type { Order, Subscription } from '../types';
 import Toast from '../components/Toast';
 
 // Orders are stored locally for now
 const ORDERS_STORAGE_KEY = 'asadazo_orders';
 
-const MOCK_PAYMENT_METHODS: PaymentMethod[] = [
-  {
-    id: '1',
-    type: 'card',
-    last4: '1234',
-    brand: 'Visa',
-    isDefault: true
-  },
-  {
-    id: '2',
-    type: 'card',
-    last4: '5678',
-    brand: 'American Express',
-    isDefault: false
-  },
-  {
-    id: '3',
-    type: 'bank_transfer',
-    iban: 'NL91ABNA0417164300',
-    accountHolder: 'John Doe',
-    isDefault: false
-  },
-  {
-    id: '4',
-    type: 'klarna',
-    isDefault: false
-  },
-  {
-    id: '5',
-    type: 'ideal',
-    idealBank: 'INGBNL2A',
-    isDefault: false
-  }
-];
+// Payment methods UI removed per request
 
-type PaymentFormData = {
-  type: 'card' | 'bank_transfer' | 'klarna' | 'ideal';
-  cardNumber: string;
-  expiryDate: string;
-  cvv: string;
-  cardholderName: string;
-  iban: string;
-  accountHolder: string;
-  idealBank: string;
-};
+// Payment method state removed
 
-const tabs: Array<{ key: 'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'; label: string; icon: React.ReactNode }> = [
+const tabs: Array<{ key: 'orders' | 'subscriptions' | 'profile' | 'logout'; label: string; icon: React.ReactNode }> = [
   { key: 'orders', label: 'Orders', icon: <Package size={16} /> },
   { key: 'subscriptions', label: 'Subscriptions', icon: <Calendar size={16} /> },
-  { key: 'payment', label: 'Payment Methods', icon: <CreditCard size={16} /> },
   { key: 'profile', label: 'Profile', icon: <User size={16} /> },
   { key: 'logout', label: 'Logout', icon: <LogOut size={16} /> },
 ];
@@ -67,54 +24,12 @@ const CustomerDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'>('orders');
-  const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
-  const [newPaymentMethod, setNewPaymentMethod] = useState<PaymentFormData>({
-    type: 'card',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardholderName: '',
-    iban: '',
-    accountHolder: '',
-    idealBank: ''
-  });
+  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'profile' | 'logout'>('subscriptions');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  const getPaymentMethodIcon = (type: string) => {
-    switch (type) {
-      case 'card': return <CreditCard size={20} />;
-      case 'bank_transfer': return <MapPin size={20} />;
-      case 'klarna': return <span className="klarna-icon">K</span>;
-      case 'ideal': return <span className="ideal-icon">iDEAL</span>;
-      default: return <CreditCard size={20} />;
-    }
-  };
+  // Payment UI removed
 
-  const handleAddPaymentMethod = () => {
-    setShowAddPaymentModal(false);
-    setNewPaymentMethod({
-      type: 'card',
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-      cardholderName: '',
-      iban: '',
-      accountHolder: '',
-      idealBank: ''
-    });
-    setToast({ message: 'Payment method added', type: 'success' });
-  };
-
-  const handleDeletePaymentMethod = (id: string) => {
-    console.log('Deleting payment method:', id);
-    setToast({ message: 'Payment method removed', type: 'success' });
-  };
-
-  const handleSetDefaultPaymentMethod = (id: string) => {
-    console.log('Setting default payment method:', id);
-    setToast({ message: 'Default payment method updated', type: 'success' });
-  };
+  // Payment handlers removed
 
   const onKeyDownTabs = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     const currentIndex = tabs.findIndex(t => t.key === activeTab);
@@ -152,9 +67,9 @@ const CustomerDashboard = () => {
         if (saved) setOrders(JSON.parse(saved));
       } catch {}
 
-      // Load subscriptions
+      // Load subscriptions (include credentials)
       try {
-        const subRes = await fetch('/api/subscriptions');
+        const subRes = await fetch('/api/subscriptions', { credentials: 'include' });
         if (subRes.ok) {
           const subData = await subRes.json();
           if (Array.isArray(subData.subscriptions)) {
