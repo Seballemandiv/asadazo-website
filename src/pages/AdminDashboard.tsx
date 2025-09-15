@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Edit, Trash2, Save, X as CloseIcon, LogOut, Package, Users, Settings, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ShoppingCart, Plus, Edit, Trash2, Save, X as CloseIcon, LogOut, Package, Users, Settings, AlertTriangle, CheckCircle, Search, Filter, Download, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import type { Product, Order } from '../types';
+import type { Product, Order, Subscription } from '../types';
 import { products as initialProducts } from '../data/products';
 
 // Mock data for orders
@@ -80,14 +80,12 @@ const MOCK_ORDERS: Order[] = [
   }
 ];
 
-type AdminSubscription = {
-  id: string;
-  userId: string;
-  type: string;
-  frequency: string;
-  totalWeight: number;
-  status: 'pending review' | 'confirmed' | 'active' | 'paused' | 'cancelled';
-  createdAt: string | Date;
+type AdminSubscription = Subscription & {
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  nextDelivery?: string | Date;
+  lastModified?: string | Date;
 };
 
 const AdminDashboard = () => {
@@ -115,6 +113,15 @@ const AdminDashboard = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [adminSubscriptions, setAdminSubscriptions] = useState<AdminSubscription[]>([]);
+  const [subscriptionFilters, setSubscriptionFilters] = useState({
+    search: '',
+    status: 'all',
+    frequency: 'all',
+    sortBy: 'createdAt',
+    sortOrder: 'desc' as 'asc' | 'desc'
+  });
+  const [selectedSubscription, setSelectedSubscription] = useState<AdminSubscription | null>(null);
+  const [showSubscriptionDetail, setShowSubscriptionDetail] = useState(false);
 
   // Use versioned storage key to prevent stale products from older deployments
   const PRODUCTS_STORAGE_KEY = 'asadazo_products_v3';
@@ -203,6 +210,94 @@ const AdminDashboard = () => {
     } catch (e) {
       showToastMessage('Failed to update', 'error');
     }
+  };
+
+  // Filter and sort subscriptions
+  const getFilteredSubscriptions = () => {
+    let filtered = [...adminSubscriptions];
+
+    // Search filter
+    if (subscriptionFilters.search) {
+      const searchLower = subscriptionFilters.search.toLowerCase();
+      filtered = filtered.filter(sub => 
+        sub.customerName?.toLowerCase().includes(searchLower) ||
+        sub.customerEmail?.toLowerCase().includes(searchLower) ||
+        sub.id.toLowerCase().includes(searchLower) ||
+        sub.type.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Status filter
+    if (subscriptionFilters.status !== 'all') {
+      filtered = filtered.filter(sub => sub.status === subscriptionFilters.status);
+    }
+
+    // Frequency filter
+    if (subscriptionFilters.frequency !== 'all') {
+      filtered = filtered.filter(sub => sub.frequency === subscriptionFilters.frequency);
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      let aValue: any = a[subscriptionFilters.sortBy as keyof AdminSubscription];
+      let bValue: any = b[subscriptionFilters.sortBy as keyof AdminSubscription];
+
+      if (subscriptionFilters.sortBy === 'createdAt' || subscriptionFilters.sortBy === 'nextDelivery') {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      }
+
+      if (subscriptionFilters.sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  };
+
+  const handleSort = (column: string) => {
+    if (subscriptionFilters.sortBy === column) {
+      setSubscriptionFilters(prev => ({
+        ...prev,
+        sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc'
+      }));
+    } else {
+      setSubscriptionFilters(prev => ({
+        ...prev,
+        sortBy: column,
+        sortOrder: 'asc'
+      }));
+    }
+  };
+
+  const exportToCSV = () => {
+    const filtered = getFilteredSubscriptions();
+    const headers = ['ID', 'Customer', 'Email', 'Phone', 'Type', 'Frequency', 'Weight (kg)', 'Status', 'Next Delivery', 'Created'];
+    const csvContent = [
+      headers.join(','),
+      ...filtered.map(sub => [
+        sub.id,
+        `"${sub.customerName || 'N/A'}"`,
+        `"${sub.customerEmail || 'N/A'}"`,
+        `"${sub.customerPhone || 'N/A'}"`,
+        sub.type,
+        sub.frequency,
+        sub.totalWeight,
+        sub.status,
+        new Date(sub.nextDelivery || sub.createdAt).toLocaleDateString(),
+        new Date(sub.createdAt).toLocaleDateString()
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `subscriptions-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleAddProduct = () => {
@@ -514,35 +609,179 @@ const AdminDashboard = () => {
 
         {activeTab === 'subscriptions' && (
           <div className="admin-section">
-            <h2>Manage Subscriptions</h2>
-            <div className="admin-products-grid">
-              {adminSubscriptions.length === 0 ? (
-                <div className="admin-placeholder">
-                  <CheckCircle size={48} />
-                  <h3>No subscriptions found</h3>
-                  <button onClick={loadSubscriptions} className="admin-add-btn">Refresh</button>
-                </div>
-              ) : (
-                adminSubscriptions.map((sub) => (
-                  <div key={sub.id} className="admin-product-card">
-                    <div className="admin-product-info">
-                      <h3>{sub.type} • {sub.frequency}</h3>
-                      <div className="product-details">
-                        <span>Status: {sub.status}</span>
-                        <span>Weight: {sub.totalWeight}kg</span>
-                        <span>User: {sub.userId}</span>
-                      </div>
-                      <div className="stock-control">
-                        <button onClick={() => updateSubscriptionStatus(sub, 'confirmed')} className="stock-btn">Confirm</button>
-                        <button onClick={() => updateSubscriptionStatus(sub, 'active')} className="stock-btn">Activate</button>
-                        <button onClick={() => updateSubscriptionStatus(sub, 'paused')} className="stock-btn">Pause</button>
-                        <button onClick={() => updateSubscriptionStatus(sub, 'cancelled')} className="stock-btn">Cancel</button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
+            <div className="admin-section-header">
+              <h2>Manage Subscriptions</h2>
+              <div className="admin-actions">
+                <button onClick={exportToCSV} className="admin-action-btn">
+                  <Download size={16} />
+                  Export CSV
+                </button>
+                <button onClick={loadSubscriptions} className="admin-action-btn">
+                  <CheckCircle size={16} />
+                  Refresh
+                </button>
+              </div>
             </div>
+
+            {/* Filters */}
+            <div className="admin-filters">
+              <div className="filter-group">
+                <Search size={16} />
+                <input
+                  type="text"
+                  placeholder="Search subscriptions..."
+                  value={subscriptionFilters.search}
+                  onChange={(e) => setSubscriptionFilters(prev => ({ ...prev, search: e.target.value }))}
+                  className="filter-input"
+                />
+              </div>
+              
+              <div className="filter-group">
+                <Filter size={16} />
+                <select
+                  value={subscriptionFilters.status}
+                  onChange={(e) => setSubscriptionFilters(prev => ({ ...prev, status: e.target.value }))}
+                  className="filter-select"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending review">Pending Review</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <select
+                  value={subscriptionFilters.frequency}
+                  onChange={(e) => setSubscriptionFilters(prev => ({ ...prev, frequency: e.target.value }))}
+                  className="filter-select"
+                >
+                  <option value="all">All Frequencies</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Bi-weekly</option>
+                  <option value="triweekly">Tri-weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Table */}
+            {adminSubscriptions.length === 0 ? (
+              <div className="admin-placeholder">
+                <CheckCircle size={48} />
+                <h3>No subscriptions found</h3>
+                <button onClick={loadSubscriptions} className="admin-add-btn">Refresh</button>
+              </div>
+            ) : (
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th onClick={() => handleSort('id')} className="sortable">
+                        ID {subscriptionFilters.sortBy === 'id' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('customerName')} className="sortable">
+                        Customer {subscriptionFilters.sortBy === 'customerName' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('customerEmail')} className="sortable">
+                        Email {subscriptionFilters.sortBy === 'customerEmail' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('type')} className="sortable">
+                        Type {subscriptionFilters.sortBy === 'type' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('frequency')} className="sortable">
+                        Frequency {subscriptionFilters.sortBy === 'frequency' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('totalWeight')} className="sortable">
+                        Weight {subscriptionFilters.sortBy === 'totalWeight' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('status')} className="sortable">
+                        Status {subscriptionFilters.sortBy === 'status' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('nextDelivery')} className="sortable">
+                        Next Delivery {subscriptionFilters.sortBy === 'nextDelivery' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th onClick={() => handleSort('createdAt')} className="sortable">
+                        Created {subscriptionFilters.sortBy === 'createdAt' && (subscriptionFilters.sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                      </th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getFilteredSubscriptions().map((sub) => (
+                      <tr key={sub.id}>
+                        <td className="table-id">{sub.id}</td>
+                        <td>
+                          <div className="customer-info">
+                            <div className="customer-name">{sub.customerName || 'N/A'}</div>
+                            <div className="customer-phone">{sub.customerPhone || 'N/A'}</div>
+                          </div>
+                        </td>
+                        <td className="table-email">{sub.customerEmail || 'N/A'}</td>
+                        <td className="table-type">{sub.type}</td>
+                        <td className="table-frequency">{sub.frequency}</td>
+                        <td className="table-weight">{sub.totalWeight}kg</td>
+                        <td>
+                          <span className={`status-badge status-${sub.status}`}>
+                            {sub.status}
+                          </span>
+                        </td>
+                        <td className="table-date">
+                          {new Date(sub.nextDelivery || sub.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="table-date">
+                          {new Date(sub.createdAt).toLocaleDateString()}
+                        </td>
+                        <td>
+                          <div className="table-actions">
+                            <button
+                              onClick={() => {
+                                setSelectedSubscription(sub);
+                                setShowSubscriptionDetail(true);
+                              }}
+                              className="action-btn view-btn"
+                              title="View Details"
+                            >
+                              <Eye size={14} />
+                            </button>
+                            <button
+                              onClick={() => updateSubscriptionStatus(sub, 'confirmed')}
+                              className="action-btn confirm-btn"
+                              title="Confirm"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={() => updateSubscriptionStatus(sub, 'active')}
+                              className="action-btn activate-btn"
+                              title="Activate"
+                            >
+                              ▶
+                            </button>
+                            <button
+                              onClick={() => updateSubscriptionStatus(sub, 'paused')}
+                              className="action-btn pause-btn"
+                              title="Pause"
+                            >
+                              ⏸
+                            </button>
+                            <button
+                              onClick={() => updateSubscriptionStatus(sub, 'cancelled')}
+                              className="action-btn cancel-btn"
+                              title="Cancel"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

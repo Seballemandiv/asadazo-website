@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, CreditCard, User, Plus, LogOut, Calendar } from 'lucide-react';
+import { Package, CreditCard, User, Plus, LogOut, Calendar, ChevronDown, ChevronUp, Edit, Pause, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import type { Order, PaymentMethod, Subscription } from '../types';
 import Toast from '../components/Toast';
@@ -67,6 +67,7 @@ const CustomerDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [expandedSubscriptions, setExpandedSubscriptions] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'payment' | 'profile' | 'logout'>('orders');
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const [newPaymentMethod, setNewPaymentMethod] = useState<PaymentFormData>({
@@ -114,6 +115,159 @@ const CustomerDashboard = () => {
   const handleSetDefaultPaymentMethod = (id: string) => {
     console.log('Setting default payment method:', id);
     setToast({ message: 'Default payment method updated', type: 'success' });
+  };
+
+  const toggleSubscriptionExpanded = (subscriptionId: string) => {
+    setExpandedSubscriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(subscriptionId)) {
+        newSet.delete(subscriptionId);
+      } else {
+        newSet.add(subscriptionId);
+      }
+      return newSet;
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending review': return 'status-pending';
+      case 'confirmed': return 'status-confirmed';
+      case 'active': return 'status-active';
+      case 'paused': return 'status-paused';
+      case 'cancelled': return 'status-cancelled';
+      default: return 'status-pending';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending review': return 'Pending Review';
+      case 'confirmed': return 'Confirmed';
+      case 'active': return 'Active';
+      case 'paused': return 'Paused';
+      case 'cancelled': return 'Cancelled';
+      default: return 'Unknown';
+    }
+  };
+
+  const getFrequencyText = (frequency: string) => {
+    switch (frequency) {
+      case 'weekly': return 'Every week';
+      case 'biweekly': return 'Every 2 weeks';
+      case 'triweekly': return 'Every 3 weeks';
+      case 'monthly': return 'Monthly';
+      default: return frequency;
+    }
+  };
+
+  const formatDeliveryAddress = (address: any) => {
+    if (!address) return 'Pickup';
+    return `${address.street} ${address.number || ''}, ${address.city}`.trim();
+  };
+
+  const handleWeightChange = async (subscriptionId: string, productId: string, newWeight: number) => {
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subscriptionId,
+          updates: {
+            selectedProducts: subscriptions
+              .find(s => s.id === subscriptionId)
+              ?.selectedProducts.map(p => 
+                p.productId === productId ? { ...p, weight: newWeight } : p
+              )
+          }
+        })
+      });
+
+      if (response.ok) {
+        // Update local state
+        setSubscriptions(prev => prev.map(sub => 
+          sub.id === subscriptionId 
+            ? {
+                ...sub,
+                selectedProducts: sub.selectedProducts.map(p => 
+                  p.productId === productId ? { ...p, weight: newWeight } : p
+                ),
+                lastModified: new Date()
+              }
+            : sub
+        ));
+        setToast({ message: 'Weight updated successfully', type: 'success' });
+      } else {
+        setToast({ message: 'Failed to update weight', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Error updating weight:', error);
+      setToast({ message: 'Error updating weight', type: 'error' });
+    }
+  };
+
+  const handlePauseSubscription = async (subscriptionId: string) => {
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subscriptionId,
+          updates: { status: 'paused' }
+        })
+      });
+
+      if (response.ok) {
+        setSubscriptions(prev => prev.map(sub => 
+          sub.id === subscriptionId 
+            ? { ...sub, status: 'paused', lastModified: new Date() }
+            : sub
+        ));
+        setToast({ message: 'Subscription paused', type: 'success' });
+      } else {
+        setToast({ message: 'Failed to pause subscription', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Error pausing subscription:', error);
+      setToast({ message: 'Error pausing subscription', type: 'error' });
+    }
+  };
+
+  const handleCancelSubscription = async (subscriptionId: string) => {
+    if (!window.confirm('Are you sure you want to cancel this subscription? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subscriptionId,
+          updates: { status: 'cancelled' }
+        })
+      });
+
+      if (response.ok) {
+        setSubscriptions(prev => prev.map(sub => 
+          sub.id === subscriptionId 
+            ? { ...sub, status: 'cancelled', lastModified: new Date() }
+            : sub
+        ));
+        setToast({ message: 'Subscription cancelled', type: 'success' });
+      } else {
+        setToast({ message: 'Failed to cancel subscription', type: 'error' });
+      }
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+      setToast({ message: 'Error cancelling subscription', type: 'error' });
+    }
   };
 
   const onKeyDownTabs = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -399,8 +553,8 @@ const CustomerDashboard = () => {
               {subscriptions.length === 0 ? (
                 <div className="empty-state">
                   <Calendar size={48} />
-                         <h3>Create your subscriptions</h3>
-                         <p>Get regular deliveries of premium Argentinian cuts</p>
+                  <h3>Create your subscriptions</h3>
+                  <p>Get regular deliveries of premium Argentinian cuts</p>
                   <button 
                     className="btn-primary"
                     onClick={() => navigate('/subscriptions')}
@@ -410,70 +564,170 @@ const CustomerDashboard = () => {
                 </div>
               ) : (
                 <div className="subscriptions-list">
-                  {subscriptions.map((subscription) => (
-                    <div key={subscription.id} className="subscription-card">
-                      <div className="subscription-header">
-                        <div className="subscription-info">
-                                 <h3>
-                                   {subscription.type === 'weekly' ? 'Weekly' :
-                                    subscription.type === 'biweekly' ? 'Bi-weekly' :
-                                    subscription.type === 'triweekly' ? 'Tri-weekly' :
-                                    subscription.type === 'monthly' ? 'Monthly' : 'Custom'} Box
-                                 </h3>
-                          <p className="subscription-weight">{subscription.totalWeight}kg</p>
-                        </div>
-                        <div className={`subscription-status status-${subscription.status}`}>
-                          {subscription.status === 'active' ? 'Active' :
-                           subscription.status === 'pending review' ? 'Under Review' :
-                           subscription.status === 'confirmed' ? 'Confirmed' :
-                           subscription.status === 'cancelled' ? 'Cancelled' : 'Paused'}
-                        </div>
-                      </div>
-                      
-                      <div className="subscription-details">
-                        <div className="subscription-products">
-                          <h4>Selected Cuts:</h4>
-                          <ul>
-                            {subscription.selectedProducts.map((product, index) => (
-                              <li key={index}>
-                                {product.productName} - {product.weight}kg
-                                {product.isSuggestion && <span className="suggestion-badge">Suggested</span>}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div className="subscription-meta">
-                          <p><strong>Frequency:</strong> {subscription.frequency}</p>
-                          <p><strong>Next Delivery:</strong> {new Date(subscription.nextDelivery).toLocaleDateString()}</p>
-                          <p><strong>Delivery:</strong> {subscription.pickupOption ? 'Pickup' : 'Delivery'}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="subscription-actions">
-                        {subscription.status === 'active' && (
-                          <button 
-                            className="btn-outline"
-                            onClick={() => {
-                              // TODO: Implement pause functionality
-                              setToast({ message: 'Subscription paused', type: 'success' });
-                            }}
-                          >
-                            Pause
-                          </button>
-                        )}
-                        <button 
-                          className="btn-cancel"
-                          onClick={() => {
-                            // TODO: Implement cancel functionality
-                            setToast({ message: 'Subscription cancelled', type: 'success' });
-                          }}
+                  {subscriptions.map((subscription) => {
+                    const isExpanded = expandedSubscriptions.has(subscription.id);
+                    const totalPrice = subscription.selectedProducts.reduce((sum, product) => sum + (product.price * product.weight), 0);
+                    
+                    return (
+                      <div key={subscription.id} className="subscription-card">
+                        {/* Compact Header - Always Visible */}
+                        <div 
+                          className="subscription-header"
+                          onClick={() => toggleSubscriptionExpanded(subscription.id)}
+                          style={{ cursor: 'pointer' }}
                         >
-                          Cancel
-                        </button>
+                          <div className="subscription-info">
+                            <h3>
+                              {subscription.type === 'weekly' ? 'Weekly' :
+                               subscription.type === 'biweekly' ? 'Bi-weekly' :
+                               subscription.type === 'triweekly' ? 'Tri-weekly' :
+                               subscription.type === 'monthly' ? 'Monthly' : 'Custom'} • {subscription.totalWeight}kg • {subscription.pickupOption ? 'Pickup' : formatDeliveryAddress(subscription.deliveryAddress)}
+                            </h3>
+                            <div className="subscription-meta-compact">
+                              <span className="frequency">{getFrequencyText(subscription.frequency)}</span>
+                              <span className="next-delivery">Next: {new Date(subscription.nextDelivery).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                          <div className="subscription-header-right">
+                            <div className={`subscription-status ${getStatusColor(subscription.status)}`}>
+                              {getStatusText(subscription.status)}
+                            </div>
+                            <div className="expand-icon">
+                              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Expanded Details - Only when expanded */}
+                        {isExpanded && (
+                          <div className="subscription-details-expanded">
+                            {/* Selected Cuts Table */}
+                            <div className="cuts-table-section">
+                              <h4>Selected Cuts</h4>
+                              <div className="cuts-table">
+                                <div className="cuts-table-header">
+                                  <div>Product</div>
+                                  <div>Weight (kg)</div>
+                                  <div>Price/kg</div>
+                                  <div>Subtotal</div>
+                                  {subscription.status === 'active' && <div>Actions</div>}
+                                </div>
+                                {subscription.selectedProducts.map((product, index) => (
+                                  <div key={index} className="cuts-table-row">
+                                    <div className="product-name">
+                                      {product.productName}
+                                      {product.isSuggestion && <span className="suggestion-badge">Suggested</span>}
+                                    </div>
+                                    <div className="weight">
+                                      {subscription.status === 'active' ? (
+                                        <input 
+                                          type="number" 
+                                          min="0" 
+                                          step="0.1" 
+                                          value={product.weight}
+                                          onChange={(e) => {
+                                            const newWeight = parseFloat(e.target.value) || 0;
+                                            handleWeightChange(subscription.id, product.productId, newWeight);
+                                          }}
+                                          className="weight-input"
+                                        />
+                                      ) : (
+                                        <span>{product.weight}kg</span>
+                                      )}
+                                    </div>
+                                    <div className="price">€{product.price.toFixed(2)}</div>
+                                    <div className="subtotal">€{(product.price * product.weight).toFixed(2)}</div>
+                                    {subscription.status === 'active' && (
+                                      <div className="actions">
+                                        <button 
+                                          className="edit-btn"
+                                          onClick={() => {
+                                            // TODO: Implement product editing
+                                            console.log('Edit product:', product.productId);
+                                          }}
+                                        >
+                                          <Edit size={14} />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                                <div className="cuts-table-footer">
+                                  <div className="total-weight">
+                                    Total Weight: {subscription.selectedProducts.reduce((sum, p) => sum + p.weight, 0).toFixed(1)}kg
+                                  </div>
+                                  <div className="total-price">
+                                    Total Price: €{totalPrice.toFixed(2)}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Delivery Information */}
+                            <div className="delivery-info-section">
+                              <h4>Delivery Information</h4>
+                              <div className="delivery-details">
+                                <div className="delivery-method">
+                                  <strong>Method:</strong> {subscription.pickupOption ? 'Pickup at store' : 'Home delivery'}
+                                </div>
+                                {!subscription.pickupOption && subscription.deliveryAddress && (
+                                  <div className="delivery-address">
+                                    <strong>Address:</strong> {formatDeliveryAddress(subscription.deliveryAddress)}
+                                  </div>
+                                )}
+                                <div className="delivery-frequency">
+                                  <strong>Frequency:</strong> {getFrequencyText(subscription.frequency)}
+                                </div>
+                                <div className="next-delivery">
+                                  <strong>Next Delivery:</strong> {new Date(subscription.nextDelivery).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Notes */}
+                            {subscription.notes && (
+                              <div className="notes-section">
+                                <h4>Notes</h4>
+                                <p>{subscription.notes}</p>
+                              </div>
+                            )}
+
+                            {/* Actions */}
+                            <div className="subscription-actions-expanded">
+                              {subscription.status === 'active' && (
+                                <>
+                                  <button 
+                                    className="btn-outline"
+                                    onClick={() => {
+                                      // TODO: Implement edit subscription
+                                      setToast({ message: 'Edit subscription functionality coming soon', type: 'success' });
+                                    }}
+                                  >
+                                    <Edit size={16} />
+                                    Edit Subscription
+                                  </button>
+                                  <button 
+                                    className="btn-outline"
+                                    onClick={() => handlePauseSubscription(subscription.id)}
+                                  >
+                                    <Pause size={16} />
+                                    Pause
+                                  </button>
+                                </>
+                              )}
+                              <button 
+                                className="btn-cancel"
+                                onClick={() => handleCancelSubscription(subscription.id)}
+                              >
+                                <X size={16} />
+                                Cancel Subscription
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

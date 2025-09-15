@@ -17,7 +17,132 @@ import { kv, kvUsersKey } from './_kv.js';
 import jwt from 'jsonwebtoken';
 import type { Subscription, SubscriptionProduct, Address } from '../src/types/index.js';
 
+// Resend email setup
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const TO_EMAIL = process.env.TO_EMAIL;
+
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
+
+// Helper function to send email notifications
+async function sendSubscriptionNotification(
+  type: 'created' | 'updated' | 'paused' | 'cancelled' | 'activated',
+  subscription: Subscription,
+  user: any,
+  changes?: any
+) {
+  if (!RESEND_API_KEY || !TO_EMAIL) {
+    console.log('Email notification skipped - missing RESEND_API_KEY or TO_EMAIL');
+    return;
+  }
+
+  try {
+    const subject = `Subscription ${type.charAt(0).toUpperCase() + type.slice(1)} - ${user.name || user.email}`;
+    
+    let emailBody = `
+      <h2>Subscription ${type.charAt(0).toUpperCase() + type.slice(1)}</h2>
+      <p><strong>Customer:</strong> ${user.name || 'N/A'} (${user.email})</p>
+      <p><strong>Phone:</strong> ${user.phone || 'N/A'}</p>
+      
+      <h3>Subscription Details:</h3>
+      <ul>
+        <li><strong>Type:</strong> ${subscription.type}</li>
+        <li><strong>Frequency:</strong> ${subscription.frequency}</li>
+        <li><strong>Total Weight:</strong> ${subscription.totalWeight}kg</li>
+        <li><strong>Status:</strong> ${subscription.status}</li>
+        <li><strong>Next Delivery:</strong> ${new Date(subscription.nextDelivery).toLocaleDateString()}</li>
+        <li><strong>Delivery Method:</strong> ${subscription.pickupOption ? 'Pickup' : 'Delivery'}</li>
+      </ul>
+    `;
+
+    if (!subscription.pickupOption && subscription.deliveryAddress) {
+      emailBody += `
+        <h3>Delivery Address:</h3>
+        <p>
+          ${subscription.deliveryAddress.street} ${subscription.deliveryAddress.number || ''}<br>
+          ${subscription.deliveryAddress.city}, ${subscription.deliveryAddress.postalCode}<br>
+          ${subscription.deliveryAddress.country}
+        </p>
+      `;
+    }
+
+    emailBody += `
+      <h3>Selected Products:</h3>
+      <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+        <tr>
+          <th>Product</th>
+          <th>Weight (kg)</th>
+          <th>Price/kg</th>
+          <th>Subtotal</th>
+        </tr>
+    `;
+
+    subscription.selectedProducts.forEach(product => {
+      emailBody += `
+        <tr>
+          <td>${product.productName}</td>
+          <td>${product.weight}</td>
+          <td>€${product.price.toFixed(2)}</td>
+          <td>€${(product.price * product.weight).toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    const totalPrice = subscription.selectedProducts.reduce((sum, product) => sum + (product.price * product.weight), 0);
+    emailBody += `
+        <tr style="font-weight: bold;">
+          <td colspan="3">Total</td>
+          <td>€${totalPrice.toFixed(2)}</td>
+        </tr>
+      </table>
+    `;
+
+    if (subscription.notes) {
+      emailBody += `<p><strong>Notes:</strong> ${subscription.notes}</p>`;
+    }
+
+    if (changes) {
+      emailBody += `
+        <h3>Changes Made:</h3>
+        <ul>
+          ${Object.entries(changes).map(([key, value]) => `<li><strong>${key}:</strong> ${value}</li>`).join('')}
+        </ul>
+      `;
+    }
+
+    emailBody += `
+      <p><strong>Action Required:</strong> ${type === 'created' ? 'Review and confirm this subscription' : 
+        type === 'updated' ? 'Review the changes made to this subscription' :
+        type === 'paused' ? 'Customer has paused their subscription' :
+        type === 'cancelled' ? 'Customer has cancelled their subscription' :
+        'Subscription has been activated'}</p>
+      
+      <p>Best regards,<br>Asadazo System</p>
+    `;
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Asadazo <noreply@asadazo.nl>',
+        to: [TO_EMAIL],
+        subject: subject,
+        html: emailBody,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Failed to send email notification:', error);
+    } else {
+      console.log(`Email notification sent for subscription ${type}:`, subscription.id);
+    }
+  } catch (error) {
+    console.error('Error sending email notification:', error);
+  }
+}
 
 // Helper function to get user from session
 async function getUserFromSession(req: VercelRequest) {
@@ -248,6 +373,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Update subscription
+      const originalSubscription = (subscriptions as Subscription[])[subscriptionIndex];
       const updatedSubscriptions = [...(subscriptions as Subscription[])];
       updatedSubscriptions[subscriptionIndex] = {
         ...updatedSubscriptions[subscriptionIndex],
@@ -257,9 +383,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       await kv.set(`subscriptions:${targetUserId}`, JSON.stringify(updatedSubscriptions));
 
+      // Send email notification for status changes
+      const updatedSubscription = updatedSubscriptions[subscriptionIndex];
+      if (updates.status && updates.status !== originalSubscription.status) {
+        const notificationType = updates.status === 'paused' ? 'paused' :
+                                updates.status === 'cancelled' ? 'cancelled' :
+                                updates.status === 'active' ? 'activated' : 'updated';
+        
+        // Get user info for email
+        const userForEmail = targetUserId === user.id ? user : await kv.get(kvUsersKey(targetUserId));
+        const userObj = typeof userForEmail === 'string' ? JSON.parse(userForEmail) : userForEmail;
+        
+        await sendSubscriptionNotification(
+          notificationType,
+          updatedSubscription,
+          userObj,
+          { status: `${originalSubscription.status} → ${updates.status}` }
+        );
+      }
+
       return res.status(200).json({ 
         success: true, 
-        subscription: updatedSubscriptions[subscriptionIndex],
+        subscription: updatedSubscription,
         message: 'Subscription updated successfully' 
       });
     } catch (error) {
