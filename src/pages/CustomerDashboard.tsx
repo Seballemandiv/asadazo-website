@@ -84,7 +84,7 @@ const CustomerDashboard = () => {
   const getPaymentMethodIcon = (type: string) => {
     switch (type) {
       case 'card': return <CreditCard size={20} />;
-      case 'bank_transfer': return <MapPin size={20} />;
+      case 'bank_transfer': return <CreditCard size={20} />;
       case 'klarna': return <span className="klarna-icon">K</span>;
       case 'ideal': return <span className="ideal-icon">iDEAL</span>;
       default: return <CreditCard size={20} />;
@@ -296,13 +296,13 @@ const CustomerDashboard = () => {
                         className="edit-button"
                         onClick={() => console.log('Edit payment method:', method.id)}
                       >
-                        <Edit size={16} />
+                        <span className="icon-placeholder" aria-hidden>✎</span>
                       </button>
                       <button 
                         className="delete-button"
                         onClick={() => handleDeletePaymentMethod(method.id)}
                       >
-                        <Trash2 size={16} />
+                        <span className="icon-placeholder" aria-hidden>🗑</span>
                       </button>
                     </div>
                   </div>
