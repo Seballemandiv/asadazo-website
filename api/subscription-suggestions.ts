@@ -31,7 +31,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const type = req.query.type as string; // 'weekly' or 'monthly'
+    const type = (req.query?.type as string) || 'weekly'; // 'weekly' or 'monthly'
     const totalWeight = type === 'weekly' ? 4 : 12;
 
     // Get all meat products for suggestions

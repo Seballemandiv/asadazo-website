@@ -121,7 +121,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         
-        const totalPrice = selectedProducts.reduce((sum, product) => sum + (product.weight * product.price), 0);
+        const totalPrice = selectedProducts.reduce((sum: number, product: SubscriptionProduct) => sum + (product.weight * product.price), 0);
         
         await resend.emails.send({
           from: 'Asadazo <noreply@asadazo.nl>',
@@ -139,7 +139,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             
             <h3>Selected Products:</h3>
             <ul>
-              ${selectedProducts.map(product => 
+              ${selectedProducts.map((product: SubscriptionProduct) => 
                 `<li>${product.productName} - ${product.weight}kg × €${product.price} = €${(product.weight * product.price).toFixed(2)}</li>`
               ).join('')}
             </ul>
@@ -215,7 +215,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
-      const subscriptionId = req.query.id as string;
+      const subscriptionId = req.query?.id as string;
 
       if (!subscriptionId) {
         return res.status(400).json({ error: 'Subscription ID required' });
