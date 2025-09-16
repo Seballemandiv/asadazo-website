@@ -120,6 +120,8 @@ const AdminDashboard = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc' as 'asc' | 'desc'
   });
+  const [selectedSubscription, setSelectedSubscription] = useState<AdminSubscription | null>(null);
+  const [showSubscriptionDetail, setShowSubscriptionDetail] = useState(false);
 
   // Use versioned storage key to prevent stale products from older deployments
   const PRODUCTS_STORAGE_KEY = 'asadazo_products_v3';
@@ -736,8 +738,8 @@ const AdminDashboard = () => {
                           <div className="table-actions">
                             <button
                               onClick={() => {
-                                // TODO: implement subscription detail drawer/modal
-                                console.log('View subscription:', sub.id);
+                                setSelectedSubscription(sub);
+                                setShowSubscriptionDetail(true);
                               }}
                               className="action-btn view-btn"
                               title="View Details"
@@ -1022,6 +1024,103 @@ const AdminDashboard = () => {
           <div className="toast-content">
             {toastType === 'success' ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
             <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
+      {showSubscriptionDetail && selectedSubscription && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
+              <h3>Subscription Details</h3>
+              <button onClick={() => { setShowSubscriptionDetail(false); setSelectedSubscription(null); }} className="admin-close-btn">
+                <CloseIcon size={20} />
+              </button>
+            </div>
+            <div className="admin-modal-body">
+              <div className="admin-form-group">
+                <label>ID</label>
+                <div>{selectedSubscription.id}</div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Customer</label>
+                  <div>{selectedSubscription.customerName || 'N/A'}</div>
+                </div>
+                <div className="admin-form-group">
+                  <label>Email</label>
+                  <div>{selectedSubscription.customerEmail || 'N/A'}</div>
+                </div>
+                <div className="admin-form-group">
+                  <label>Phone</label>
+                  <div>{selectedSubscription.customerPhone || 'N/A'}</div>
+                </div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Type</label>
+                  <div>{selectedSubscription.type}</div>
+                </div>
+                <div className="admin-form-group">
+                  <label>Frequency</label>
+                  <div>{selectedSubscription.frequency}</div>
+                </div>
+                <div className="admin-form-group">
+                  <label>Total Weight</label>
+                  <div>{selectedSubscription.totalWeight} kg</div>
+                </div>
+              </div>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label>Status</label>
+                  <div>
+                    <span className={`status-badge status-${selectedSubscription.status}`}>
+                      {selectedSubscription.status}
+                    </span>
+                  </div>
+                </div>
+                <div className="admin-form-group">
+                  <label>Next Delivery</label>
+                  <div>{new Date(selectedSubscription.nextDelivery || selectedSubscription.createdAt).toLocaleDateString()}</div>
+                </div>
+                <div className="admin-form-group">
+                  <label>Created</label>
+                  <div>{new Date(selectedSubscription.createdAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+              {selectedSubscription.deliveryAddress && (
+                <div className="admin-form-group">
+                  <label>Delivery Address</label>
+                  <div>{`${selectedSubscription.deliveryAddress.street || ''} ${selectedSubscription.deliveryAddress.city || ''} ${selectedSubscription.deliveryAddress.postalCode || ''}`.trim() || 'N/A'}</div>
+                </div>
+              )}
+              {Array.isArray(selectedSubscription.selectedProducts) && selectedSubscription.selectedProducts.length > 0 && (
+                <div className="admin-form-group">
+                  <label>Selected Cuts</label>
+                  <div className="cuts-table">
+                    <div className="cuts-table-header">
+                      <span>Product</span>
+                      <span>Kg</span>
+                      <span>€/kg</span>
+                      <span>Subtotal</span>
+                    </div>
+                    {selectedSubscription.selectedProducts.map((p, idx) => (
+                      <div key={idx} className="cuts-table-row">
+                        <span>{p.productName}</span>
+                        <span>{p.weight ?? 0}</span>
+                        <span>{typeof p.price === 'number' ? `€${p.price.toFixed(2)}` : '€0.00'}</span>
+                        <span>{typeof p.price === 'number' && typeof p.weight === 'number' ? `€${(p.price * p.weight).toFixed(2)}` : '€0.00'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="admin-modal-footer">
+              <button onClick={() => updateSubscriptionStatus(selectedSubscription, 'confirmed')} className="action-btn confirm-btn" title="Confirm">Confirm</button>
+              <button onClick={() => updateSubscriptionStatus(selectedSubscription, 'active')} className="action-btn activate-btn" title="Activate">Activate</button>
+              <button onClick={() => updateSubscriptionStatus(selectedSubscription, 'paused')} className="action-btn pause-btn" title="Pause">Pause</button>
+              <button onClick={() => updateSubscriptionStatus(selectedSubscription, 'cancelled')} className="action-btn cancel-btn" title="Cancel">Cancel</button>
+            </div>
           </div>
         </div>
       )}
