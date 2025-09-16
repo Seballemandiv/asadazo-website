@@ -120,8 +120,6 @@ const AdminDashboard = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc' as 'asc' | 'desc'
   });
-  const [selectedSubscription, setSelectedSubscription] = useState<AdminSubscription | null>(null);
-  const [showSubscriptionDetail, setShowSubscriptionDetail] = useState(false);
 
   // Use versioned storage key to prevent stale products from older deployments
   const PRODUCTS_STORAGE_KEY = 'asadazo_products_v3';
@@ -738,8 +736,8 @@ const AdminDashboard = () => {
                           <div className="table-actions">
                             <button
                               onClick={() => {
-                                setSelectedSubscription(sub);
-                                setShowSubscriptionDetail(true);
+                                // TODO: implement subscription detail drawer/modal
+                                console.log('View subscription:', sub.id);
                               }}
                               className="action-btn view-btn"
                               title="View Details"
