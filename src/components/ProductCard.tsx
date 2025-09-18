@@ -11,6 +11,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart, isInCart } = useCart();
   const [quantity, setQuantity] = useState(product.minPack);
   const [showQuantityInput, setShowQuantityInput] = useState(false);
+  const [isOutOfStockTouched, setIsOutOfStockTouched] = useState(false);
 
   const handleAddToCart = () => {
     if (quantity >= product.minPack && quantity <= product.stock) {
@@ -20,14 +21,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
   };
 
+  const handleTouchClickOnOutOfStock = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOutOfStockTouched(!isOutOfStockTouched);
+  }
+
   const isOutOfStock = product.stock <= 0;
   const isQuantityValid = quantity >= product.minPack && quantity <= product.stock;
 
   return (
-    <div className="product-card">
+    <div className={`product-card ${isOutOfStockTouched ? "product-overlay--touched" : ""}`} onTouchStart={handleTouchClickOnOutOfStock}>
       <div className="product-image">
         <img src={product.image || '/placeholder-meat.jpg'} alt={product.name} />
-        <div className="product-overlay">
+        <div className='product-overlay'>
           {!isOutOfStock ? (
             <div className="add-to-cart-overlay">
               {showQuantityInput ? (
@@ -79,8 +86,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </div>
       
       <div className="product-info">
-        <h3 className="product-name">{product.name}</h3>
-        <p className="product-description">{product.description}</p>
+        <div>
+          <h3 className="product-name">{product.name}</h3>
+          <p className="product-description">{product.description}</p>
+        </div>
         
         <div className="product-details">
           <div className="product-price">
